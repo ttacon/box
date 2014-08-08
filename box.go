@@ -131,3 +131,24 @@ func (c *Client) CreateFolder(name string, parent int) (*Folder, error) {
 	}
 	return &data, nil
 }
+
+// TODO(ttacon): can these ids be non-integer? if not, why are they returned as
+// strings in the API
+// TODO(ttacon): return the response for the user to play with if they want
+func (c *Client) GetFolder(folderId string) (*Folder, error) {
+	resp, err := c.Trans.Client().Get(
+		fmt.Sprintf("%s/folders/%s", BASE_URL, folderId))
+	if err != nil {
+		fmt.Println("err: ", err)
+		return nil, err
+	}
+
+	var data Folder
+	fmt.Println("resp: ", resp)
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return nil, err
+	}
+	return &data, nil
+}
