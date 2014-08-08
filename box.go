@@ -152,3 +152,22 @@ func (c *Client) GetFolder(folderId string) (*Folder, error) {
 	}
 	return &data, nil
 }
+
+// TODO(ttacon): return the response for the user to play with if they want
+func (c *Client) GetFolderItems(folderId string) (*ItemCollection, error) {
+	resp, err := c.Trans.Client().Get(
+		fmt.Sprintf("%s/folders/%s/items", BASE_URL, folderId))
+	if err != nil {
+		fmt.Println("err: ", err)
+		return nil, err
+	}
+
+	var data ItemCollection
+	fmt.Println("resp: ", resp)
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return nil, err
+	}
+	return &data, nil
+}
