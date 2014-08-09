@@ -49,5 +49,5 @@ func main() {
 	pretty.Print(items)
 
 	// Print out the new tokens for next time
-	fmt.Println(tok)
+	fmt.Printf("%#v\n", tok.Token)
 }
