@@ -290,3 +290,24 @@ func (c *Client) ItemsInTrash(fields []string, limit, offset int) (*http.Respons
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#folders-get-a-trashed-folder
+func (c *Client) GetTrashedFolder(folderId string) (*http.Response, *Folder, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/folders/%s/trash", BASE_URL, folderId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Folder
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
