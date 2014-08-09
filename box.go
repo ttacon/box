@@ -362,3 +362,17 @@ func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Resp
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#folders-permanently-delete-a-trashed-folder
+func (c *Client) PermanentlyDeleteTrashedFolder(folderId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/folders/%s/trash", BASE_URL, folderId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
