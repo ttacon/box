@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	"code.google.com/p/goauth2/oauth"
@@ -301,6 +302,56 @@ func (c *Client) GetTrashedFolder(folderId string) (*http.Response, *Folder, err
 	if err != nil {
 		return nil, nil, err
 	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Folder
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
+
+// Documentation: https://developers.box.com/docs/#folders-restore-a-trashed-folder
+// NOTES:
+//     -name and parent id are not required unless the previous parent folder no
+//      longer exists or a folder with the previous name exists
+func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Response, *Folder, error) {
+	var bodyReader io.Reader
+	var toSerialze map[string]interface{}
+	if len(name) > 0 {
+		toSerialze = map[string]interface{}{
+			"name": name,
+		}
+	}
+	if len(parent) > 0 {
+		if toSerialze != nil {
+			toSerialze["parent"] = map[string]string{
+				"id": parent,
+			}
+		} else {
+			toSerialze = map[string]interface{}{
+				"parent": map[string]string{
+					"id": parent,
+				},
+			}
+		}
+	}
+
+	if toSerialze != nil {
+		bodyBytes, err := json.Marshal(toSerialze)
+		if err != nil {
+			return nil, nil, err
+		}
+		bodyReader = bytes.NewReader(bodyBytes)
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s/folders/%s", BASE_URL, folderId),
+		bodyReader,
+	)
 
 	resp, err := c.Trans.Client().Do(req)
 	if err != nil {
