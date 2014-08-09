@@ -22,5 +22,4 @@ _testmain.go
 *.exe
 *.test
 
-boxtoken/
 testing/
