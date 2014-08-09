@@ -51,6 +51,7 @@ type Item struct {
 	ETag       *string `json:"etag,omitempty"`        // again, not sure what this type is supposed to be
 	Name       string  `json:"name,omitempty"`
 	Login      string  `json:"login,omitempty"`
+	SHA1       string  `json:"sha"`
 }
 
 // TODO(ttacon): leave plurality?
@@ -266,4 +267,26 @@ type Collaboration struct {
 type Collaborations struct {
 	TotalCount int `json:"total_count"`
 	Entries    []*Collaboration
+}
+
+// Documentation: https://developers.box.com/docs/#folders-get-the-items-in-the-trash
+func (c *Client) ItemsInTrash(fields []string, limit, offset int) (*http.Response, *ItemCollection, error) {
+	// TODO(ttacon): actually use fields, limit and offset lol
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/folders/trash/items", BASE_URL),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data ItemCollection
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
 }
