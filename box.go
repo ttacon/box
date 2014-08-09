@@ -71,6 +71,7 @@ type Link struct {
 	Permissions       *Permissions `json:"permissions"`
 }
 
+// Documentation: https://developers.box.com/docs/#folders-folder-object
 type Folder struct {
 	ID                string          `json:"id,omitempty"`
 	FolderUploadEmail *AccessEmail    `json:"folder_upload_email,omitempty"`
@@ -100,6 +101,7 @@ type Folder struct {
 // TODO(ttacon): return the response so the user can check the status code
 // or we should check it? it's more flexible if we let the user decide what
 // they view as an error
+// Documentation: https://developers.box.com/docs/#folders-create-a-new-folder
 func (c *Client) CreateFolder(name string, parent int) (*Folder, error) {
 	var body = map[string]interface{}{
 		"name": name,
@@ -136,6 +138,7 @@ func (c *Client) CreateFolder(name string, parent int) (*Folder, error) {
 // TODO(ttacon): can these ids be non-integer? if not, why are they returned as
 // strings in the API
 // TODO(ttacon): return the response for the user to play with if they want
+// Documentation: https://developers.box.com/docs/#folders-get-information-about-a-folder
 func (c *Client) GetFolder(folderId string) (*Folder, error) {
 	resp, err := c.Trans.Client().Get(
 		fmt.Sprintf("%s/folders/%s", BASE_URL, folderId))
@@ -155,6 +158,7 @@ func (c *Client) GetFolder(folderId string) (*Folder, error) {
 }
 
 // TODO(ttacon): return the response for the user to play with if they want
+// Documentation: https://developers.box.com/docs/#folders-retrieve-a-folders-items
 func (c *Client) GetFolderItems(folderId string) (*ItemCollection, error) {
 	resp, err := c.Trans.Client().Get(
 		fmt.Sprintf("%s/folders/%s/items", BASE_URL, folderId))
@@ -173,6 +177,9 @@ func (c *Client) GetFolderItems(folderId string) (*ItemCollection, error) {
 	return &data, nil
 }
 
+// TODO(ttacon): https://developers.box.com/docs/#folders-update-information-about-a-folder
+
+// Documentation: https://developers.box.com/docs/#folders-delete-a-folder
 func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, error) {
 	req, err := http.NewRequest(
 		"DELETE",
@@ -183,4 +190,35 @@ func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, 
 	}
 
 	return c.Trans.Client().Do(req)
+}
+
+func (c *Client) CopyFolder(src, dest, name string) (*http.Response, *Folder, error) {
+	var bodyData = map[string]interface{}{
+		"parent": map[string]string{
+			"id": dest,
+		},
+		"name": name,
+	}
+	marshalled, err := json.Marshal(bodyData)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s/folders/%s/copy", BASE_URL, src),
+		bytes.NewReader(marshalled),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data Folder
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
 }
