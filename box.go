@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"code.google.com/p/goauth2/oauth"
 )
@@ -170,4 +171,16 @@ func (c *Client) GetFolderItems(folderId string) (*ItemCollection, error) {
 		return nil, err
 	}
 	return &data, nil
+}
+
+func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/folders/%s?recursive=%b", BASE_URL, folderId, recursive),
+		nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
 }
