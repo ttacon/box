@@ -219,3 +219,67 @@ func (c *Client) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollect
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// NOTE: we only return the response as there are many possible responses that we
+// feel the user should have control over
+// Documentation: https://developers.box.com/docs/#files-get-a-thumbnail-for-a-file
+func (c *Client) GetThumbnail(fileId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/files/%s/thumbnail.extension", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
+
+// Documentation: https://developers.box.com/docs/#files-create-a-shared-link-for-a-file
+func (c *Client) CreateSharedLinkForFile(fileId, access, unsharedAt string, canDownload, canPreview bool) (*http.Response, *File, error) {
+	var dataMap = make(map[string]interface{})
+	if len(access) > 0 {
+		dataMap["access"] = access
+	}
+	// TODO(ttacon): support unshared_at as time.Time
+	// TODO(ttacon): validate access is open or company before add permissions
+	if canDownload {
+		dataMap["permissions"] = map[string]bool{
+			"can_download": canDownload,
+		}
+	}
+	if canPreview {
+		if m, ok := dataMap["permissions"]; ok {
+			mVal, _ := m.(map[string]bool)
+			mVal["can_preview"] = canPreview
+		} else {
+			dataMap["permissions"] = map[string]bool{
+				"can_preview": canPreview,
+			}
+		}
+	}
+
+	dataBytes, err := json.Marshal(&dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"PUT",
+		fmt.Sprintf("%s/files/%s", BASE_URL, fileId),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data File
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
