@@ -67,7 +67,7 @@ func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
 
 // Documentation https://developer.box.com/docs/#files-upload-a-file
 // TODO(ttacon): deal with handling SHA1 headers
-func (c *Client) UploadFile(filePath string) (*http.Response, *FileCollection, error) {
+func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCollection, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, nil, err
@@ -89,12 +89,25 @@ func (c *Client) UploadFile(filePath string) (*http.Response, *FileCollection, e
 		writer = multipart.NewWriter(body)
 	)
 
+	// write the file
 	part, err := writer.CreateFormFile("file", fi.Name())
 	if err != nil {
 		return nil, nil, err
 	}
-
 	part.Write(fileContents)
+
+	// write the other form fields we need
+	err = writer.WriteField("filename", fi.Name())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = writer.WriteField("parent_id", parentId)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// TODO(ttacon): add in content_created_at, content_modified_at
 
 	err = writer.Close()
 	if err != nil {
@@ -106,7 +119,7 @@ func (c *Client) UploadFile(filePath string) (*http.Response, *FileCollection, e
 		fmt.Sprintf("https://upload.box.com/api/2.0/files/content"),
 		body,
 	)
-
+	req.Header.Add("Content-Type", writer.FormDataContentType())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -137,17 +150,22 @@ func (c *Client) FileDelete(fileId string) (*http.Response, error) {
 
 // Documentation: https://developers.box.com/docs/#files-copy-a-file
 func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, error) {
-	var data = map[string]interface{}{
+	var bodyData = map[string]interface{}{
 		"parent": map[string]string{
 			"id": parent,
 		},
 		"name": name,
 	}
 
+	dataBytes, err := json.Marshal(&bodyData)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := http.NewRequest(
 		"POST",
 		fmt.Sprintf("%s/files/%s/copy", BASE_URL, fileId),
-		nil,
+		bytes.NewReader(dataBytes),
 	)
 	if err != nil {
 		return nil, nil, err
@@ -160,7 +178,7 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 
 	var data File
 	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, data, err
+	return resp, &data, err
 }
 
 // Documentation:

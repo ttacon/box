@@ -52,7 +52,7 @@ func main() {
 
 	var c = &box.Client{tok}
 
-	resp, folder, err := c.UploadFile(*fileName)
+	resp, folder, err := c.UploadFile(*fileName, "0")
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(folder)
