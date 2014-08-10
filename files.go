@@ -1,10 +1,16 @@
-package box // TODO(ttacon): reconcile this with Folder for one common struct?
+package box
+
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
+	"os"
 )
 
+// TODO(ttacon): reconcile this with Folder for one common struct?
 type File struct {
 	ID                string          `json:"id,omitempty"`
 	FolderUploadEmail *AccessEmail    `json:"folder_upload_email,omitempty"`
@@ -33,6 +39,11 @@ type File struct {
 	SHA1 string `json:"sha1"`
 }
 
+type FileCollection struct {
+	TotalCount int     `json:"total_count"`
+	Entries    []*File `json:"entries"`
+}
+
 // Documentation: https://developer.box.com/docs/#files-get
 func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
 	req, err := http.NewRequest(
@@ -55,4 +66,101 @@ func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
 }
 
 // Documentation https://developer.box.com/docs/#files-upload-a-file
-func (c *Client) UploadFile(fileName string)
+// TODO(ttacon): deal with handling SHA1 headers
+func (c *Client) UploadFile(filePath string) (*http.Response, *FileCollection, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer file.Close()
+
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fi, err := file.Stat()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var (
+		body   = &bytes.Buffer{}
+		writer = multipart.NewWriter(body)
+	)
+
+	part, err := writer.CreateFormFile("file", fi.Name())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	part.Write(fileContents)
+
+	err = writer.Close()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("https://upload.box.com/api/2.0/files/content"),
+		body,
+	)
+
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data FileCollection
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
+
+// Documentation: https://developers.box.com/docs/#files-delete-a-file
+func (c *Client) FileDelete(fileId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/files/%s", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
+
+// Documentation: https://developers.box.com/docs/#files-copy-a-file
+func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, error) {
+	var data = map[string]interface{}{
+		"parent": map[string]string{
+			"id": parent,
+		},
+		"name": name,
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s/files/%s/copy", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data File
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, data, err
+}
+
+// Documentation:
