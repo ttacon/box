@@ -197,3 +197,25 @@ func (c *Client) DownloadFile(fileId string) (*http.Response, error) {
 
 	return c.Trans.Client().Do(req)
 }
+
+// Documentation: https://developers.box.com/docs/#files-view-versions-of-a-file
+// TODO(ttacon): don't use file collection, make actual structs specific to file versions
+func (c *Client) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollection, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/files/%s/versions", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data FileCollection
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
