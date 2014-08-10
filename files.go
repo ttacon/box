@@ -135,7 +135,7 @@ func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCol
 }
 
 // Documentation: https://developers.box.com/docs/#files-delete-a-file
-func (c *Client) FileDelete(fileId string) (*http.Response, error) {
+func (c *Client) DeleteFile(fileId string) (*http.Response, error) {
 	req, err := http.NewRequest(
 		"DELETE",
 		fmt.Sprintf("%s/files/%s", BASE_URL, fileId),
@@ -181,4 +181,19 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 	return resp, &data, err
 }
 
-// Documentation:
+// NOTE: we return the http.Response as Box may return a 202 if there is not
+// yet a download link, or a 302 with the link - this allows the user to
+// decide what to do.
+// Documentation: https://developers.box.com/docs/#files-download-a-file
+func (c *Client) DownloadFile(fileId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/files/%s/content", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
