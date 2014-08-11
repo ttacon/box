@@ -353,3 +353,40 @@ func (c *Client) PermanentlyDeleteTrashedFile(fileId string) (*http.Response, er
 
 	return c.Trans.Client().Do(req)
 }
+
+// Documentation: https://developers.box.com/docs/#files-view-the-comments-on-a-file
+func (c *Client) ViewCommentsOnFile(fileId string) (*http.Response, *CommentCollection, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/files/%s/comments", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data CommentCollection
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
+
+type CommentCollection struct {
+	TotalCount int        `json:"total_count"`
+	Entries    []*Comment `json:"entries"`
+}
+
+type Comment struct {
+	Type           string `json:"type"`
+	Id             string `json:"id"`
+	IsReplyComment bool   `json:"is_reply_comment"`
+	Message        string `json:"message"`
+	CreatedBy      *Item  `json:"created_by"` // TODO(ttacon): change this to user when make struct
+	Item           *Item  `json:"item"`
+	CreatedAt      string `json:"created_at"`  // TODO(ttacon): change to time.Time
+	ModifiedAt     string `json:"modified_at"` // TODO(ttacon): change to time.Time
+}
