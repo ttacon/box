@@ -339,3 +339,17 @@ func (c *Client) RestoreTrashedItem(name, parentId string) (*http.Response, *Fil
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#files-permanently-delete-a-trashed-file
+func (c *Client) PermanentlyDeleteTrashedFile(fileId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/files/%s/trash", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
