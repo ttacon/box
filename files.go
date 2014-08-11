@@ -390,3 +390,36 @@ type Comment struct {
 	CreatedAt      string `json:"created_at"`  // TODO(ttacon): change to time.Time
 	ModifiedAt     string `json:"modified_at"` // TODO(ttacon): change to time.Time
 }
+
+// Documentation: https://developers.box.com/docs/#files-get-the-tasks-for-a-file
+func (c *Client) GetTasksForFile(fileId string) (*http.Response, *TaskCollection, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/files/%s/tasks", BASE_URL, fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data TaskCollection
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
+
+type TaskCollection struct {
+	TotalCount int     `json:"total_count"`
+	Entries    []*Task `json:"entries"`
+}
+
+type Task struct {
+	Type  string  `json:"type"`
+	Id    string  `json:"id"`
+	Item  *Item   `json:"item"`
+	DueAt *string `json:"due_at"` // TODO(ttacon): time.Time
+}
