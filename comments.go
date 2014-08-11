@@ -1,5 +1,12 @@
 package box
 
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+)
+
 type CommentCollection struct {
 	TotalCount int        `json:"total_count"`
 	Entries    []*Comment `json:"entries"`
@@ -14,4 +21,38 @@ type Comment struct {
 	Item           *Item  `json:"item"`
 	CreatedAt      string `json:"created_at"`  // TODO(ttacon): change to time.Time
 	ModifiedAt     string `json:"modified_at"` // TODO(ttacon): change to time.Time
+}
+
+// Documentation: https://developers.box.com/docs/#comments-add-a-comment-to-an-item
+func (c *Client) AddComment(itemType, id, message, taggedMessage string) (*http.Response, *Comment, error) {
+	var dataMap = map[string]interface{}{
+		"item": map[string]string{
+			"type": itemType,
+			"id":   id,
+		},
+		"message":        message,
+		"tagged_message": taggedMessage,
+	}
+	dataBytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s/comments", BASE_URL),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Comment
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
 }
