@@ -85,3 +85,24 @@ func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Respons
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#comments-get-information-about-a-comment
+func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/comments/%s", BASE_URL, commentId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Comment
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
