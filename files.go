@@ -375,22 +375,6 @@ func (c *Client) ViewCommentsOnFile(fileId string) (*http.Response, *CommentColl
 	return resp, &data, err
 }
 
-type CommentCollection struct {
-	TotalCount int        `json:"total_count"`
-	Entries    []*Comment `json:"entries"`
-}
-
-type Comment struct {
-	Type           string `json:"type"`
-	Id             string `json:"id"`
-	IsReplyComment bool   `json:"is_reply_comment"`
-	Message        string `json:"message"`
-	CreatedBy      *Item  `json:"created_by"` // TODO(ttacon): change this to user when make struct
-	Item           *Item  `json:"item"`
-	CreatedAt      string `json:"created_at"`  // TODO(ttacon): change to time.Time
-	ModifiedAt     string `json:"modified_at"` // TODO(ttacon): change to time.Time
-}
-
 // Documentation: https://developers.box.com/docs/#files-get-the-tasks-for-a-file
 func (c *Client) GetTasksForFile(fileId string) (*http.Response, *TaskCollection, error) {
 	req, err := http.NewRequest(
@@ -410,16 +394,4 @@ func (c *Client) GetTasksForFile(fileId string) (*http.Response, *TaskCollection
 	var data TaskCollection
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
-}
-
-type TaskCollection struct {
-	TotalCount int     `json:"total_count"`
-	Entries    []*Task `json:"entries"`
-}
-
-type Task struct {
-	Type  string  `json:"type"`
-	Id    string  `json:"id"`
-	Item  *Item   `json:"item"`
-	DueAt *string `json:"due_at"` // TODO(ttacon): time.Time
 }
