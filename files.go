@@ -304,3 +304,38 @@ func (c *Client) GetTrashedFile(fileId string) (*http.Response, *File, error) {
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#files-restore-a-trashed-item
+func (c *Client) RestoreTrashedItem(name, parentId string) (*http.Response, *File, error) {
+	var dataMap = make(map[string]interface{})
+	if len(name) > 0 {
+		dataMap["name"] = name
+	}
+	if len(parentId) > 0 {
+		dataMap["parent"] = map[string]string{
+			"id": parentId,
+		}
+	}
+	dataBytes, err := json.Marshal(&dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf(),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data File
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
