@@ -106,3 +106,17 @@ func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#comments-delete-a-comment
+func (c *Client) DeleteComment(commentId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/comments/%s", BASE_URL, commentId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
