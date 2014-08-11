@@ -56,3 +56,32 @@ func (c *Client) AddComment(itemType, id, message, taggedMessage string) (*http.
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#comments-change-a-comments-message
+func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Response, *Comment, error) {
+	var dataMap = map[string]string{
+		"message": message,
+	}
+	dataBytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := htt.NewRequest(
+		"PUT",
+		fmt.Sprintf("%s/comments/%s", BASE_URL, commendId),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Comment
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
