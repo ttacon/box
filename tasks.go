@@ -63,3 +63,24 @@ func (c *Client) CreateTask(itemId, itemType, action, message, due_at string) (*
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-get-a-task
+func (c *Client) GetTask(taskId string) (*http.Response, *Task, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/tasks/%s", BASE_URL, taskId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Task
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
