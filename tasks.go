@@ -256,3 +256,37 @@ func (c *Client) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, 
 
 	return c.Trans.Client().Do(req)
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-update-a-task-assignment
+func (c *Client) UpdateTaskAssignment(taskAssignmentId, message, resolution_state string) (*http.Response, *TaskAssignment, error) {
+	var dataMap = make(map[string]string)
+	if len(message) > 0 {
+		dataMap["message"] = message
+	}
+	if len(resolution_state) > 0 {
+		dataMap["resolution_state"] = resolution_state
+	}
+
+	dataBytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"PUT",
+		fmt.Sprintf("%s/task_assignments/%s", BASE_URL, taskAssignmentId),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data TaskAssignment
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
