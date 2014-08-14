@@ -1,8 +1,6 @@
 package box
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -223,26 +221,16 @@ func (c *Client) UpdateTaskAssignment(taskAssignmentId, message, resolution_stat
 		dataMap["resolution_state"] = resolution_state
 	}
 
-	dataBytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"PUT",
-		fmt.Sprintf("%s/task_assignments/%s", BASE_URL, taskAssignmentId),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/task_assignments/%s", taskAssignmentId),
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data TaskAssignment
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *TaskAssignment
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
