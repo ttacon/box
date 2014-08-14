@@ -11,7 +11,7 @@ type Collaboration struct {
 	ExpiresAt      *string `json:"expires_at"`  // TODO(ttacon): *time.Time
 	Status         string  `json:"status"`
 	AccessibleBy   *Item   `json:"accessible_by"`   // TODO(ttacon): turn into user
-	Role           string  `json:"role"`            // TODO(ttacon): enum
+	Role           string  `json:"role"`            // TODO(ttacon): enum (own file?)
 	AcknowledgedAt string  `json:"acknowledged_at"` // TODO(ttacon): time.Time
 	Item           *Item   `json:"item"`            // TODO(ttacon): mini-folder struct
 }
