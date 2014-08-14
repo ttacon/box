@@ -242,3 +242,17 @@ func (c *Client) GetTaskAssignment(taskAssignmentId string) (*http.Response, *Ta
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-delete-a-task-assignment
+func (c *Client) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/task_assignment/%s", BASE_URL, taskAssignmentId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
