@@ -137,6 +137,7 @@ func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-the-assignments-for-a-task
+// TODO(ttacon): rename when add per resource services
 func (c *Client) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssignmentCollection, error) {
 	req, err := c.NewRequest(
 		"GET",
