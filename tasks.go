@@ -84,3 +84,40 @@ func (c *Client) GetTask(taskId string) (*http.Response, *Task, error) {
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-update-a-task
+func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Response, *Task, error) {
+	var dataMap = make(map[string]interface{})
+	if len(action) > 0 {
+		dataMap["action"] = action
+	}
+	if len(message) > 0 {
+		dataMap["message"] = message
+	}
+	if len(due_at) > 0 {
+		dataMap["due_at"] = due_at
+	}
+
+	dataBytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"PUT",
+		fmt.Sprintf("%s/tasks/%s", BASE_URL, taskId),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Task
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
