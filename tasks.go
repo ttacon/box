@@ -27,6 +27,19 @@ type Task struct {
 	TaskAssignmentCollection *TaskAssignmentCollection `json:"task_assignment_collection"`
 }
 
+type TaskAssignmentCollection struct {
+	TotalCount int               `json:"total_count"`
+	Entries    []*TaskAssignment `json:"entries"`
+}
+
+// TODO(ttacon): find out where the deuce this is defined in their documentation?!?!?!
+type TaskAssignment struct {
+	Type       *string `json:"type"`
+	Id         string  `json:"id"`
+	Item       *Item   `json:"item"`
+	AssignedTo *Item   `json:"assigned_to"` // TODO(ttacon): change to mini-user
+}
+
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task
 func (c *Client) CreateTask(itemId, itemType, action, message, due_at string) (*http.Response, *Task, error) {
 	var dataMap = map[string]interface{}{
