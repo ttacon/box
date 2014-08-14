@@ -113,3 +113,17 @@ func (c *Client) EditCollaboration(collaborationId, role, status string) (*http.
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#collaborations-remove-a-collaboration
+func (c *Client) RemoveCollaboration(collaborationId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/collaborations/%s", BASE_URL, collaborationId),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
