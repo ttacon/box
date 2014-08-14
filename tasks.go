@@ -15,10 +15,16 @@ type TaskCollection struct {
 // Documentation: https://developers.box.com/docs/#tasks-task-object
 // TODO(ttacon): add missing fields
 type Task struct {
-	Type  string  `json:"type"`
-	Id    string  `json:"id"`
-	Item  *Item   `json:"item"`
-	DueAt *string `json:"due_at"` // TODO(ttacon): time.Time
+	Type                     string                    `json:"type"`
+	Id                       string                    `json:"id"`
+	Item                     *Item                     `json:"item"`
+	DueAt                    *string                   `json:"due_at"`     // TODO(ttacon): time.Time
+	CreatedAt                *string                   `json:"created_at"` // TODO(ttacon): time.Time
+	CreatedBy                *Item                     `json:"created_by"` // TODO(ttacon): change to user
+	Action                   *string                   `json:"action"`     //TODO(ttacon): validation as this must be 'review'?
+	Message                  *string                   `json:"message"`
+	IsCompleted              *bool                     `json:"is_completed"`
+	TaskAssignmentCollection *TaskAssignmentCollection `json:"task_assignment_collection"`
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task
