@@ -215,3 +215,24 @@ func (c *Client) CreateTaskAssignment(taskId, taskType, assignToId, assignToLogi
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-get-a-task-assignment
+func (c *Client) GetTaskAssignment(taskAssignmentId string) (*http.Response, *TaskAssignment, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/task_assignments/%s", taskAssignmentId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data TaskAssignment
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
