@@ -124,16 +124,16 @@ func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Respo
 
 // Documentation: https://developers.box.com/docs/#tasks-delete-a-task
 func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("%s/tasks/%s", BASE_URL, taskId),
 		nil,
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-the-assignments-for-a-task
