@@ -126,7 +126,7 @@ func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Respo
 func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/tasks/%s", BASE_URL, taskId),
+		fmt.Sprintf("/tasks/%s", taskId),
 		nil,
 	)
 	if err != nil {
@@ -138,23 +138,18 @@ func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
 
 // Documentation: https://developers.box.com/docs/#tasks-get-the-assignments-for-a-task
 func (c *Client) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssignmentCollection, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/tasks/%s/assignments", BASE_URL, taskId),
+		fmt.Sprintf("/tasks/%s/assignments", taskId),
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data TaskAssignmentCollection
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *TaskAssignmentCollection
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task-assignment
