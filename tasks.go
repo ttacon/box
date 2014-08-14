@@ -207,7 +207,7 @@ func (c *Client) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, 
 		nil,
 	)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	return c.Do(req, nil)
