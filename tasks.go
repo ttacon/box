@@ -121,3 +121,17 @@ func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Respo
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-delete-a-task
+func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"DELETE",
+		fmt.Sprintf("%s/tasks/%s", BASE_URL, taskId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return c.Trans.Client().Do(req)
+}
