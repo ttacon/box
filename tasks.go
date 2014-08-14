@@ -247,7 +247,7 @@ func (c *Client) GetTaskAssignment(taskAssignmentId string) (*http.Response, *Ta
 func (c *Client) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, error) {
 	req, err := http.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/task_assignment/%s", BASE_URL, taskAssignmentId),
+		fmt.Sprintf("%s/task_assignments/%s", BASE_URL, taskAssignmentId),
 		nil,
 	)
 	if err != nil {
