@@ -34,10 +34,16 @@ type TaskAssignmentCollection struct {
 
 // TODO(ttacon): find out where the deuce this is defined in their documentation?!?!?!
 type TaskAssignment struct {
-	Type       *string `json:"type"`
-	Id         string  `json:"id"`
-	Item       *Item   `json:"item"`
-	AssignedTo *Item   `json:"assigned_to"` // TODO(ttacon): change to mini-user
+	Type            *string `json:"type"`
+	Id              string  `json:"id"`
+	Item            *Item   `json:"item"`
+	AssignedTo      *Item   `json:"assigned_to"` // TODO(ttacon): change to mini-user
+	Message         *string `json:"message"`
+	ResolutionState *string `json:"resolution_state"`
+	AssignedBy      *Item   `json:"assigned_by"`  // TODO(ttacon): change to mini-user
+	CompletedAt     *string `json:"completed_at"` // TODO(ttacon): time.Time
+	AssignedAt      *string `json:"assigned_at"`  // TODO(ttacon): time.Time
+	RemindedAt      *string `json:"reminded_at"`  // TODO(ttacon): time.Time
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task
