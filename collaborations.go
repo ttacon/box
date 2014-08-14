@@ -148,3 +148,27 @@ func (c *Client) RetrieveCollaboration(collaborationId string) (*http.Response, 
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#collaborations-get-pending-collaborations
+// NOTE(ttacon): not doing to add param since it's just calling the first url with an explicit
+// query string (that never changes, why isn't it an actual route then, or bundled into the
+// documentation of the first one?)
+func (c *Client) GetPendingCollaborations() (*http.Response, *Collaborations, error) {
+	req, err := http.NewRequest(
+		"GET",
+		fmt.Sprintf("%s/collaborations?status=pending", BASE_URL),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data Collaborations
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
