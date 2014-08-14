@@ -175,3 +175,43 @@ func (c *Client) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssi
 	err = json.NewDecoder(resp.Body).Decode(&data)
 	return resp, &data, err
 }
+
+// Documentation: https://developers.box.com/docs/#tasks-create-a-task-assignment
+func (c *Client) CreateTaskAssignment(taskId, taskType, assignToId, assignToLogin string) (*http.Response, *TaskAssignment, error) {
+	var dataMap = map[string]map[string]string{
+		"task": map[string]string{
+			"id":   taskId,
+			"type": taskType,
+		},
+		"assign_to": make(map[string]string),
+	}
+	if len(assignToId) > 0 {
+		dataMap["assign_to"]["id"] = assignToId
+	}
+	if len(assignToLogin) > 0 {
+		dataMap["assign_to"]["login"] = assignToLogin
+	}
+
+	dataBytes, err := json.Marshal(dataMap)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s/task_assignments", BASE_URL),
+		bytes.NewReader(dataBytes),
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	resp, err := c.Trans.Client().Do(req)
+	if err != nil {
+		return resp, nil, err
+	}
+
+	var data *TaskAssignment
+	err = json.NewDecoder(resp.Body).Decode(&data)
+	return resp, &data, err
+}
