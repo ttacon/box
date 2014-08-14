@@ -65,28 +65,18 @@ func (c *Client) CreateTask(itemId, itemType, action, message, due_at string) (*
 		dataMap["due_at"] = due_at
 	}
 
-	dataBytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
-		fmt.Sprintf("%s/tasks", BASE_URL),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/tasks"),
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Task
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Task
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-a-task
