@@ -12,6 +12,8 @@ import (
 const (
 	BASE_URL   = "https://api.box.com/2.0"
 	UPLOAD_URL = "https://upload.box.com/api/2.0"
+
+	userAgent = "go-box:v0.0.1"
 )
 
 type Client struct {
@@ -45,6 +47,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 
 	// TODO(ttacon): identify which headers we should add
 	// e.g. "Accept", "Content-Type", "User-Agent", etc.
+	req.Header.Add("User-Agent", userAgent)
 	return req, nil
 }
 
