@@ -1,7 +1,6 @@
 package box
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -127,21 +126,16 @@ func (c *Client) RetrieveCollaboration(collaborationId string) (*http.Response, 
 // query string (that never changes, why isn't it an actual route then, or bundled into the
 // documentation of the first one?)
 func (c *Client) GetPendingCollaborations() (*http.Response, *Collaborations, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/collaborations?status=pending", BASE_URL),
+		fmt.Sprintf("/collaborations?status=pending"), // TODO(ttacon): remove Sprintf call
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Collaborations
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Collaborations
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
