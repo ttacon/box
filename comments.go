@@ -84,14 +84,14 @@ func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) 
 
 // Documentation: https://developers.box.com/docs/#comments-delete-a-comment
 func (c *Client) DeleteComment(commentId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/comments/%s", BASE_URL, commentId),
+		fmt.Sprintf("/comments/%s", commentId),
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
