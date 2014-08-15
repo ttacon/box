@@ -131,16 +131,16 @@ func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCol
 
 // Documentation: https://developers.box.com/docs/#files-delete-a-file
 func (c *Client) DeleteFile(fileId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/files/%s", BASE_URL, fileId),
+		fmt.Sprintf("/files/%s", fileId),
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#files-copy-a-file
