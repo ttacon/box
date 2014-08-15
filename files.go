@@ -171,16 +171,16 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 // decide what to do.
 // Documentation: https://developers.box.com/docs/#files-download-a-file
 func (c *Client) DownloadFile(fileId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/files/%s/content", BASE_URL, fileId),
+		fmt.Sprintf("/files/%s/content", fileId),
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#files-view-versions-of-a-file
