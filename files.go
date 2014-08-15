@@ -46,23 +46,18 @@ type FileCollection struct {
 
 // Documentation: https://developer.box.com/docs/#files-get
 func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/files/%s", BASE_URL, fileId),
+		fmt.Sprintf("/files/%s", fileId),
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data File
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *File
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation https://developer.box.com/docs/#files-upload-a-file
