@@ -114,34 +114,25 @@ func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, 
 
 // Documentation: https://developers.box.com/docs/#folders-copy-a-folder
 func (c *Client) CopyFolder(src, dest, name string) (*http.Response, *Folder, error) {
-	var bodyData = map[string]interface{}{
+	var body = map[string]interface{}{
 		"parent": map[string]string{
 			"id": dest,
 		},
 		"name": name,
 	}
-	marshalled, err := json.Marshal(bodyData)
-	if err != nil {
-		return nil, nil, err
-	}
 
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
-		fmt.Sprintf("%s/folders/%s/copy", BASE_URL, src),
-		bytes.NewReader(marshalled),
+		fmt.Sprintf("/folders/%s/copy", src),
+		body,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Folder
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Folder
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-create-a-shared-link-for-a-folder
