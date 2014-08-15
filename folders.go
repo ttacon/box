@@ -100,15 +100,16 @@ func (c *Client) GetFolderItems(folderId string) (*http.Response, *ItemCollectio
 // TODO(ttacon): https://developers.box.com/docs/#folders-update-information-about-a-folder
 // Documentation: https://developers.box.com/docs/#folders-delete-a-folder
 func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/folders/%s?recursive=%b", BASE_URL, folderId, recursive),
-		nil)
+		fmt.Sprintf("/folders/%s?recursive=%b", folderId, recursive),
+		nil,
+	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#folders-copy-a-folder
