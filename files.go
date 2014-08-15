@@ -109,6 +109,8 @@ func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCol
 		return nil, nil, err
 	}
 
+	// TODO(ttacon): refactor to use Client.NewRequest/Do when it supports
+	// io.Writer
 	req, err := http.NewRequest(
 		"POST",
 		fmt.Sprintf("https://upload.box.com/api/2.0/files/content"),
