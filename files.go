@@ -328,21 +328,16 @@ func (c *Client) ViewCommentsOnFile(fileId string) (*http.Response, *CommentColl
 
 // Documentation: https://developers.box.com/docs/#files-get-the-tasks-for-a-file
 func (c *Client) GetTasksForFile(fileId string) (*http.Response, *TaskCollection, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/files/%s/tasks", BASE_URL, fileId),
+		fmt.Sprintf("/files/%s/tasks", fileId),
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data TaskCollection
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *TaskCollection
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
