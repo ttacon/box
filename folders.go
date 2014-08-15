@@ -1,10 +1,7 @@
 package box
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 )
 
@@ -190,7 +187,6 @@ func (c *Client) GetTrashedFolder(folderId string) (*http.Response, *Folder, err
 //     -name and parent id are not required unless the previous parent folder no
 //      longer exists or a folder with the previous name exists
 func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Response, *Folder, error) {
-	var bodyReader io.Reader
 	var toSerialze map[string]interface{}
 	if len(name) > 0 {
 		toSerialze = map[string]interface{}{
@@ -211,28 +207,15 @@ func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Resp
 		}
 	}
 
-	if toSerialze != nil {
-		bodyBytes, err := json.Marshal(toSerialze)
-		if err != nil {
-			return nil, nil, err
-		}
-		bodyReader = bytes.NewReader(bodyBytes)
-	}
-
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
-		fmt.Sprintf("%s/folders/%s", BASE_URL, folderId),
-		bodyReader,
+		fmt.Sprintf("/folders/%s", folderId),
+		toSerialze,
 	)
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Folder
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Folder
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#folders-permanently-delete-a-trashed-folder
