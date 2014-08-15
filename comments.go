@@ -1,7 +1,6 @@
 package box
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -53,28 +52,19 @@ func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Respons
 	var dataMap = map[string]string{
 		"message": message,
 	}
-	dataBytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
 
-	req, err := htt.NewRequest(
+	req, err := c.NewRequest(
 		"PUT",
-		fmt.Sprintf("%s/comments/%s", BASE_URL, commendId),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/comments/%s", commendId),
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Comment
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Comment
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#comments-get-information-about-a-comment
