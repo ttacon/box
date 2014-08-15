@@ -240,28 +240,18 @@ func (c *Client) CreateSharedLinkForFile(fileId, access, unsharedAt string, canD
 		}
 	}
 
-	dataBytes, err := json.Marshal(&dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"PUT",
-		fmt.Sprintf("%s/files/%s", BASE_URL, fileId),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/files/%s", fileId),
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data File
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *File
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-get-a-trashed-file
