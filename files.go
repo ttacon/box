@@ -152,28 +152,18 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 		"name": name,
 	}
 
-	dataBytes, err := json.Marshal(&bodyData)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	req, err := http.NewRequest(
 		"POST",
-		fmt.Sprintf("%s/files/%s/copy", BASE_URL, fileId),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/files/%s/copy", fileId),
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data File
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *File
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // NOTE: we return the http.Response as Box may return a 202 if there is not
