@@ -39,7 +39,7 @@ type Folder struct {
 // or we should check it? it's more flexible if we let the user decide what
 // they view as an error
 // Documentation: https://developers.box.com/docs/#folders-create-a-new-folder
-func (c *Client) CreateFolder(name string, parent int) (*Folder, error) {
+func (c *Client) CreateFolder(name string, parent int) (*http.Response, *Folder, error) {
 	var body = map[string]interface{}{
 		"name": name,
 		"parent": map[string]int{
@@ -47,75 +47,57 @@ func (c *Client) CreateFolder(name string, parent int) (*Folder, error) {
 		},
 	}
 
-	buf, err := json.Marshal(body)
+	resp, err := c.NewRequest(
+		"POST",
+		"/folders",
+		body,
+	)
 	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
+		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Post(
-		fmt.Sprintf("%s/folders", BASE_URL),
-		"application/json",
-		bytes.NewReader(buf))
-	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
-	}
-
-	var data Folder
-	fmt.Println("resp: ", resp)
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
-	}
-	return &data, nil
+	var data *Folder
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // TODO(ttacon): can these ids be non-integer? if not, why are they returned as
 // strings in the API
 // TODO(ttacon): return the response for the user to play with if they want
 // Documentation: https://developers.box.com/docs/#folders-get-information-about-a-folder
-func (c *Client) GetFolder(folderId string) (*Folder, error) {
-	resp, err := c.Trans.Client().Get(
-		fmt.Sprintf("%s/folders/%s", BASE_URL, folderId))
+func (c *Client) GetFolder(folderId string) (*http.Response, *Folder, error) {
+	resp, err := c.NewRequest(
+		"GET",
+		fmt.Sprintf("/folders/%s", folderId),
+		nil,
+	)
 	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
+		return nil, nil, err
 	}
 
-	var data Folder
-	fmt.Println("resp: ", resp)
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
-	}
-	return &data, nil
+	var data *Folder
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // TODO(ttacon): return the response for the user to play with if they want
 // Documentation: https://developers.box.com/docs/#folders-retrieve-a-folders-items
-func (c *Client) GetFolderItems(folderId string) (*ItemCollection, error) {
-	resp, err := c.Trans.Client().Get(
-		fmt.Sprintf("%s/folders/%s/items", BASE_URL, folderId))
+func (c *Client) GetFolderItems(folderId string) (*http.Response, *ItemCollection, error) {
+	resp, err := c.NewRequest(
+		"GET",
+		fmt.Sprintf("/folders/%s/items", folderId),
+		nil,
+	)
 	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
+		return nil, nil, err
 	}
 
-	var data ItemCollection
-	fmt.Println("resp: ", resp)
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	if err != nil {
-		fmt.Println("err: ", err)
-		return nil, err
-	}
-	return &data, nil
+	var data *ItemCollection
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-update-information-about-a-folder
-
 // Documentation: https://developers.box.com/docs/#folders-delete-a-folder
 func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, error) {
 	req, err := http.NewRequest(
