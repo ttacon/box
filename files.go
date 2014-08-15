@@ -271,7 +271,7 @@ func (c *Client) GetTrashedFile(fileId string) (*http.Response, *File, error) {
 }
 
 // Documentation: https://developers.box.com/docs/#files-restore-a-trashed-item
-func (c *Client) RestoreTrashedItem(name, parentId string) (*http.Response, *File, error) {
+func (c *Client) RestoreTrashedItem(fileId, name, parentId string) (*http.Response, *File, error) {
 	var dataMap = make(map[string]interface{})
 	if len(name) > 0 {
 		dataMap["name"] = name
@@ -281,28 +281,19 @@ func (c *Client) RestoreTrashedItem(name, parentId string) (*http.Response, *Fil
 			"id": parentId,
 		}
 	}
-	dataBytes, err := json.Marshal(&dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
 
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
-		fmt.Sprintf(),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/files/%s", fileId),
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data File
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *File
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-permanently-delete-a-trashed-file
