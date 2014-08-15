@@ -108,23 +108,18 @@ func (c *Client) RemoveCollaboration(collaborationId string) (*http.Response, er
 
 // Documentation: https://developers.box.com/docs/#collaborations-retrieve-a-collaboration
 func (c *Client) RetrieveCollaboration(collaborationId string) (*http.Response, *Collaboration, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/collaborations/%s", BASE_URL, collaborationId),
+		fmt.Sprintf("/collaborations/%s", collaborationId),
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Collaboration
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Collaboration
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-get-pending-collaborations
