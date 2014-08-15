@@ -33,28 +33,19 @@ func (c *Client) AddComment(itemType, id, message, taggedMessage string) (*http.
 		"message":        message,
 		"tagged_message": taggedMessage,
 	}
-	dataBytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
 
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
-		fmt.Sprintf("%s/comments", BASE_URL),
-		bytes.NewReader(dataBytes),
+		"/comments",
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Comment
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Comment
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#comments-change-a-comments-message
