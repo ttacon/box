@@ -204,16 +204,16 @@ func (c *Client) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollect
 // feel the user should have control over
 // Documentation: https://developers.box.com/docs/#files-get-a-thumbnail-for-a-file
 func (c *Client) GetThumbnail(fileId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/files/%s/thumbnail.extension", BASE_URL, fileId),
+		fmt.Sprintf("/files/%s/thumbnail.extension", fileId),
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req)
 }
 
 // Documentation: https://developers.box.com/docs/#files-create-a-shared-link-for-a-file
