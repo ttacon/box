@@ -136,26 +136,20 @@ func (c *Client) CopyFolder(src, dest, name string) (*http.Response, *Folder, er
 }
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-create-a-shared-link-for-a-folder
-
 // Documentation: https://developers.box.com/docs/#folders-view-a-folders-collaborations
 func (c *Client) GetCollaborations(folderId string) (*http.Response, *Collaborations, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/folders/%s/collaborations", BASE_URL, folderId),
+		fmt.Sprintf("/folders/%s/collaborations", folderId),
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Collaborations
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Collaborations
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#folders-get-the-items-in-the-trash
