@@ -94,16 +94,16 @@ func (c *Client) EditCollaboration(collaborationId, role, status string) (*http.
 
 // Documentation: https://developers.box.com/docs/#collaborations-remove-a-collaboration
 func (c *Client) RemoveCollaboration(collaborationId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/collaborations/%s", BASE_URL, collaborationId),
+		fmt.Sprintf("/collaborations/%s", collaborationId),
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-retrieve-a-collaboration
