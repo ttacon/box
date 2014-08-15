@@ -3,14 +3,13 @@ package box
 import (
 	"bytes"
 	"encoding/json"
-
-	// TODO(ttacon):some of these fields pop up everywhere, make
-	// common struct and anonymously extend the others with it?
-	// Documentation: https://developers.box.com/docs/#collaborations
 	"fmt"
 	"net/http"
 )
 
+// TODO(ttacon):some of these fields pop up everywhere, make
+// common struct and anonymously extend the others with it?
+// Documentation: https://developers.box.com/docs/#collaborations
 type Collaboration struct {
 	Type           string  `json:"type"`
 	ID             string  `json:"id"`
@@ -56,28 +55,18 @@ func (c *Client) AddCollaboration(
 		v["login"] = accessibleEmail
 	}
 
-	dataBytes, err := json.Marshal(dataMap)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
-		fmt.Sprintf("%s/collaborations", BASE_URL),
-		bytes.NewReader(dataBytes),
+		fmt.Sprintf("/collaborations"), // TODO(ttacon): remove Sprintf call - it's useless
+		dataMap,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Collaboration
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Collaboration
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-edit-a-collaboration
