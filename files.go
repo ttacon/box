@@ -2,7 +2,6 @@ package box
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -121,14 +120,9 @@ func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCol
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data FileCollection
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *FileCollection
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-delete-a-file
