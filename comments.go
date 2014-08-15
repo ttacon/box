@@ -1,7 +1,6 @@
 package box
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -69,23 +68,18 @@ func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Respons
 
 // Documentation: https://developers.box.com/docs/#comments-get-information-about-a-comment
 func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
-		fmt.Sprintf("%s/comments/%s", BASE_URL, commentId),
+		fmt.Sprintf("/comments/%s", commentId),
 		nil,
 	)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := c.Trans.Client().Do(req)
-	if err != nil {
-		return resp, nil, err
-	}
-
-	var data Comment
-	err = json.NewDecoder(resp.Body).Decode(&data)
-	return resp, &data, err
+	var data *Comment
+	resp, err := c.Do(req, data)
+	return resp, data, err
 }
 
 // Documentation: https://developers.box.com/docs/#comments-delete-a-comment
