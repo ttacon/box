@@ -298,16 +298,16 @@ func (c *Client) RestoreTrashedItem(fileId, name, parentId string) (*http.Respon
 
 // Documentation: https://developers.box.com/docs/#files-permanently-delete-a-trashed-file
 func (c *Client) PermanentlyDeleteTrashedFile(fileId string) (*http.Response, error) {
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"DELETE",
-		fmt.Sprintf("%s/files/%s/trash", BASE_URL, fileId),
+		fmt.Sprintf("/files/%s/trash", fileId),
 		nil,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	return c.Trans.Client().Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#files-view-the-comments-on-a-file
