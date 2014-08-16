@@ -44,7 +44,7 @@ func (c *Client) CreateFolder(name string, parent int) (*http.Response, *Folder,
 		},
 	}
 
-	resp, err := c.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
 		"/folders",
 		body,
@@ -63,7 +63,7 @@ func (c *Client) CreateFolder(name string, parent int) (*http.Response, *Folder,
 // TODO(ttacon): return the response for the user to play with if they want
 // Documentation: https://developers.box.com/docs/#folders-get-information-about-a-folder
 func (c *Client) GetFolder(folderId string) (*http.Response, *Folder, error) {
-	resp, err := c.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/folders/%s", folderId),
 		nil,
@@ -80,7 +80,7 @@ func (c *Client) GetFolder(folderId string) (*http.Response, *Folder, error) {
 // TODO(ttacon): return the response for the user to play with if they want
 // Documentation: https://developers.box.com/docs/#folders-retrieve-a-folders-items
 func (c *Client) GetFolderItems(folderId string) (*http.Response, *ItemCollection, error) {
-	resp, err := c.NewRequest(
+	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/folders/%s/items", folderId),
 		nil,

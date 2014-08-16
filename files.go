@@ -148,10 +148,10 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 		"name": name,
 	}
 
-	req, err := http.NewRequest(
+	req, err := c.NewRequest(
 		"POST",
 		fmt.Sprintf("/files/%s/copy", fileId),
-		dataMap,
+		bodyData,
 	)
 	if err != nil {
 		return nil, nil, err
@@ -209,7 +209,7 @@ func (c *Client) GetThumbnail(fileId string) (*http.Response, error) {
 		return nil, err
 	}
 
-	return c.Do(req)
+	return c.Do(req, nil)
 }
 
 // Documentation: https://developers.box.com/docs/#files-create-a-shared-link-for-a-file

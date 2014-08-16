@@ -18,7 +18,15 @@ const (
 
 type Client struct {
 	Trans   *oauth.Transport
-	BaseUrl *url.Url
+	BaseUrl *url.URL
+}
+
+func NewClient(oa *oauth.Transport) (*Client, error) {
+	u, err := url.Parse(BASE_URL)
+	return &Client{
+		Trans:   oa,
+		BaseUrl: u,
+	}, err
 }
 
 // NewRequest creates an *http.Request with the given method, url and
@@ -55,7 +63,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 
 // Do "makes" the request, and if there are no errors and resp is not nil,
 // it attempts to unmarshal the  (json) response body into resp.
-func (c *Client) Do(req *http.Request, resp interface{}) (*http.Response, error) {
+func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, error) {
 	resp, err := c.Trans.Client().Do(req)
 	if err != nil {
 		return nil, err
@@ -64,8 +72,8 @@ func (c *Client) Do(req *http.Request, resp interface{}) (*http.Response, error)
 	defer resp.Body.Close()
 
 	// TODO(ttacon): maybe support passing in io.Writer as resp (downloads)?
-	if resp != nil {
-		err = json.NewDecoder(resp.Body).Decode(resp)
+	if respStr != nil {
+		err = json.NewDecoder(resp.Body).Decode(respStr)
 	}
 	return resp, err
 }

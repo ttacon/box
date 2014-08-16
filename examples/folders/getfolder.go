@@ -50,9 +50,14 @@ func main() {
 		}
 	)
 
-	var c = &box.Client{tok}
+	var c, err = box.NewClient(tok)
+	if err != nil {
+		fmt.Println("err: ", err)
+		return
+	}
 
-	folder, err := c.GetFolder(*folderId)
+	resp, folder, err := c.GetFolder(*folderId)
+	fmt.Println("%#v\n", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(folder)
 
