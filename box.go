@@ -21,6 +21,8 @@ type Client struct {
 	BaseUrl *url.Url
 }
 
+// NewRequest creates an *http.Request with the given method, url and
+// request body (if one is passed).
 func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Request, error) {
 	// this method is based off
 	// https://github.com/google/go-github/blob/master/github/github.go:
@@ -51,6 +53,8 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	return req, nil
 }
 
+// Do "makes" the request, and if there are no errors and resp is not nil,
+// it attempts to unmarshal the  (json) response body into resp.
 func (c *Client) Do(req *http.Request, resp interface{}) (*http.Response, error) {
 	resp, err := c.Trans.Client().Do(req)
 	if err != nil {
