@@ -1,3 +1,7 @@
 package box
 
-// TODO(ttacon): all of it lol
+// TODO(ttacon): do it
+
+////////// types //////////
+
+////////// functions //////////
