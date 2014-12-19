@@ -1,5 +1,14 @@
 package box
 
+import (
+	"fmt"
+	"net/http"
+)
+
+// NOTE(ttacon): the majority of these functions are Enterprise specific and I don't
+// have an enterprise account to test with so... I guess I could just add them
+// and hope for the best? (lulz)
+
 ////////// types //////////
 
 type User struct {
@@ -32,17 +41,98 @@ type User struct {
 }
 
 // Documentation: https://developers.box.com/docs/#users-get-the-current-users-information
-func (c *Client) Me() (*User, error) {
+func (c *Client) Me() (*http.Response, *User, error) {
 	req, err := c.NewRequest(
 		"GET",
 		"/users/me",
 		nil,
 	)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
+	}
+
+	var data *User
+	resp, err := c.Do(req, &data)
+	return resp, data, err
+}
+
+// Docs: https://developers.box.com/docs/#users-move-folder-into-another-folder
+// TODO(ttacon): do it
+
+// Docs: https://developers.box.com/docs/#users-changing-a-users-primary-login
+func (c *Client) ChangePrimaryLogin(userID, newLogin string) (*http.Response, *User, error) {
+	req, err := c.NewRequest(
+		"PUT",
+		fmt.Sprintf("/users/%s", userID),
+		map[string]string{
+			"login": newLogin,
+		},
+	)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	var data *User
 	resp, err := c.Do(req, data)
-	return data, err
+	return resp, data, err
+}
+
+// Docs: https://developers.box.com/docs/#users-get-all-email-aliases-for-a-user
+func (c *Client) EmailAliases(userID string) (*http.Response, []EmailAlias, error) {
+	req, err := c.NewRequest(
+		"GET",
+		fmt.Sprintf("/users/%s/email_aliases", userID),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data *CountedEmailAliases
+	resp, err := c.Do(req, &data)
+	var aliases []EmailAlias
+	if data != nil {
+		aliases = data.Entries
+	}
+	return resp, aliases, err
+}
+
+type CountedEmailAliases struct {
+	TotalCount int          `json:"total_count"`
+	Entries    []EmailAlias `json:"entries"`
+}
+
+type EmailAlias struct {
+	Type        string `json:"type"`
+	ID          string `json:"id"`
+	IsConfirmed bool   `json:"is_confirmed"`
+	Email       string `json:"email"`
+}
+
+// Docs: https://developers.box.com/docs/#users-add-an-email-alias-for-a-user
+func (c *Client) AddEmailAlias(userID, email string) (*http.Response, *EmailAlias, error) {
+	req, err := c.NewRequest(
+		"POST",
+		fmt.Sprintf("/users/%s/email_aliases", userID),
+		map[string]string{
+			"email": email,
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data *EmailAlias
+	resp, err := c.Do(req, data)
+	return resp, data, err
+}
+
+// Docs: https://developers.box.com/docs/#users-remove-an-email-alias-from-a-user
+func (c *Client) DeletEmailAlias(userID, emailAliasID string) (*http.Response, bool, error) {
+	req, err := c.NewRequest(
+		"DELETE",
+		fmt.Sprintf("/users/%s/email_aliases/%s", userID, emailAliasID),
+		nil,
+	)
+	return resp, resp.StatusCode == 204, err
 }

@@ -3,6 +3,8 @@ package box
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -35,14 +37,19 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 	// this method is based off
 	// https://github.com/google/go-github/blob/master/github/github.go:
 	// NewRequest as it's a very nice way of doing this
-	parsedUrl, err := url.Parse(urlStr)
+	_, err := url.Parse(urlStr)
 	if err != nil {
 		return nil, err
 	}
 
 	// This is useful as this functionality works the same for the actual
 	// BASE_URL and the download url (TODO(ttacon): insert download url)
-	resolvedUrl := c.BaseUrl.ResolveReference(parsedUrl)
+	// this seems to be failing to work not RFC3986 (url resolution)
+	//	resolvedUrl := c.BaseUrl.ResolveReference(parsedUrl)
+	resolvedUrl, err := url.Parse(c.BaseUrl.String() + urlStr)
+	if err != nil {
+		return nil, err
+	}
 	buf := new(bytes.Buffer)
 	if body != nil {
 		if err = json.NewEncoder(buf).Encode(body); err != nil {
@@ -68,8 +75,11 @@ func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, err
 	if err != nil {
 		return nil, err
 	}
-
 	defer resp.Body.Close()
+
+	if resp.StatusCode > 299 || resp.StatusCode < 200 {
+		return nil, errors.New(fmt.Sprintf("http request failed, resp: %#v", resp))
+	}
 
 	// TODO(ttacon): maybe support passing in io.Writer as resp (downloads)?
 	if respStr != nil {
