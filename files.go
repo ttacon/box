@@ -54,9 +54,9 @@ func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
 		return nil, nil, err
 	}
 
-	var data *File
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data File
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation https://developer.box.com/docs/#files-upload-a-file

@@ -62,5 +62,5 @@ func main() {
 	pretty.Print(file)
 
 	// Print out the new tokens for next time
-	fmt.Printf("%#v\n", tok.Token)
+	fmt.Printf("\n%#v\n", tok.Token)
 }
