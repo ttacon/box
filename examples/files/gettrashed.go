@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"code.google.com/p/goauth2/oauth"
-	"github.com/kr/pretty"
 	"github.com/ttacon/box"
+	"github.com/ttacon/pretty"
 )
 
 var (
@@ -50,7 +50,9 @@ func main() {
 		}
 	)
 
-	var c = &box.Client{tok}
+	var c = &box.Client{
+		Trans: tok,
+	}
 	resp, file, err := c.GetTrashedFile(*fileId)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)

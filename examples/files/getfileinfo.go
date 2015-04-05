@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"code.google.com/p/goauth2/oauth"
-	"github.com/kr/pretty"
 	"github.com/ttacon/box"
+	"github.com/ttacon/pretty"
 )
 
 var (
@@ -50,7 +50,11 @@ func main() {
 		}
 	)
 
-	var c = &box.Client{tok}
+	var c, err = box.NewClient(tok)
+	if err != nil {
+		fmt.Println("failed to create client, err: ", err)
+		return
+	}
 
 	resp, file, err := c.GetFile(*fileId)
 	fmt.Println("resp: ", resp)

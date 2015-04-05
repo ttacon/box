@@ -134,5 +134,10 @@ func (c *Client) DeletEmailAlias(userID, emailAliasID string) (*http.Response, b
 		fmt.Sprintf("/users/%s/email_aliases/%s", userID, emailAliasID),
 		nil,
 	)
+	if err != nil {
+		return nil, false, err
+	}
+
+	resp, err := c.Do(req, nil)
 	return resp, resp.StatusCode == 204, err
 }

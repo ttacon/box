@@ -15,7 +15,9 @@ var (
 		Scope:        "",
 		AuthURL:      "https://www.box.com/api/oauth2/authorize",
 		TokenURL:     "https://www.box.com/api/oauth2/token",
-		RedirectURL:  "http://localhost:8080/handle",
+		// AuthURL:     "http://localhost:8080/authorize",
+		// TokenURL:    "http://localhost:8080/token",
+		RedirectURL: "http://localhost:8080/handle",
 	}
 
 	clientId     = flag.String("cid", "", "Client ID")

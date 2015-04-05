@@ -32,8 +32,8 @@ func (c *Client) Groups() (*http.Response, []Group, error) {
 		return nil, nil, err
 	}
 
-	var data GroupCollection
-	resp, err := c.Do(req, &data)
+	var data *GroupCollection
+	resp, err := c.Do(req, data)
 	var groups []Group
 	if data != nil {
 		groups = data.Entries
@@ -57,7 +57,7 @@ func (c *Client) CreateGroup(name string) (*http.Response, *Group, error) {
 
 	var data Group
 	resp, err := c.Do(req, &data)
-	return resp, data, err
+	return resp, &data, err
 }
 
 // Docs: https://developers.box.com/docs/#update-a-group
@@ -76,7 +76,7 @@ func (c *Client) UpdateGroup(groupID, name string) (*http.Response, *Group, erro
 
 	var data Group
 	resp, err := c.Do(req, &data)
-	return resp, data, err
+	return resp, &data, err
 }
 
 // Docs: https://developers.box.com/docs/#delete-a-group
@@ -91,6 +91,7 @@ func (c *Client) DeleteGroup(groupID string) (*http.Response, bool, error) {
 		return nil, false, err
 	}
 
+	var data Group
 	resp, err := c.Do(req, &data)
 	return resp, resp.StatusCode == 204, err
 }
