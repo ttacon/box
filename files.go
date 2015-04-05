@@ -157,9 +157,9 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 		return nil, nil, err
 	}
 
-	var data *File
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data File
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // NOTE: we return the http.Response as Box may return a 202 if there is not
@@ -191,9 +191,9 @@ func (c *Client) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollect
 		return nil, nil, err
 	}
 
-	var data *FileCollection
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data FileCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // NOTE: we only return the response as there are many possible responses that we
@@ -245,9 +245,9 @@ func (c *Client) CreateSharedLinkForFile(fileId, access, unsharedAt string, canD
 		return nil, nil, err
 	}
 
-	var data *File
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data File
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-get-a-trashed-file
@@ -261,9 +261,9 @@ func (c *Client) GetTrashedFile(fileId string) (*http.Response, *File, error) {
 		return nil, nil, err
 	}
 
-	var data *File
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data File
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-restore-a-trashed-item
@@ -287,9 +287,9 @@ func (c *Client) RestoreTrashedItem(fileId, name, parentId string) (*http.Respon
 		return nil, nil, err
 	}
 
-	var data *File
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data File
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-permanently-delete-a-trashed-file
@@ -317,9 +317,9 @@ func (c *Client) ViewCommentsOnFile(fileId string) (*http.Response, *CommentColl
 		return nil, nil, err
 	}
 
-	var data *CommentCollection
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data CommentCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-get-the-tasks-for-a-file
@@ -333,7 +333,7 @@ func (c *Client) GetTasksForFile(fileId string) (*http.Response, *TaskCollection
 		return nil, nil, err
 	}
 
-	var data *TaskCollection
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data TaskCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }

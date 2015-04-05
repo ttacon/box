@@ -72,9 +72,9 @@ func (c *Client) CreateTask(itemId, itemType, action, message, due_at string) (*
 		return nil, nil, err
 	}
 
-	var data *Task
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Task
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-a-task
@@ -88,9 +88,9 @@ func (c *Client) GetTask(taskId string) (*http.Response, *Task, error) {
 		return nil, nil, err
 	}
 
-	var data *Task
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Task
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-update-a-task
@@ -115,9 +115,9 @@ func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Respo
 		return nil, nil, err
 	}
 
-	var data *Task
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Task
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-delete-a-task
@@ -146,9 +146,9 @@ func (c *Client) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssi
 		return nil, nil, err
 	}
 
-	var data *TaskAssignmentCollection
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data TaskAssignmentCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task-assignment
@@ -176,9 +176,9 @@ func (c *Client) CreateTaskAssignment(taskId, taskType, assignToId, assignToLogi
 		return nil, nil, err
 	}
 
-	var data *TaskAssignment
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data TaskAssignment
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-a-task-assignment
@@ -192,9 +192,9 @@ func (c *Client) GetTaskAssignment(taskAssignmentId string) (*http.Response, *Ta
 		return nil, nil, err
 	}
 
-	var data *TaskAssignment
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data TaskAssignment
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-delete-a-task-assignment
@@ -230,7 +230,7 @@ func (c *Client) UpdateTaskAssignment(taskAssignmentId, message, resolution_stat
 		return nil, nil, err
 	}
 
-	var data *TaskAssignment
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data TaskAssignment
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }

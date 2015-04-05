@@ -62,9 +62,9 @@ func (c *Client) AddCollaboration(
 		return nil, nil, err
 	}
 
-	var data *Collaboration
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Collaboration
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-edit-a-collaboration
@@ -86,9 +86,9 @@ func (c *Client) EditCollaboration(collaborationId, role, status string) (*http.
 		return nil, nil, err
 	}
 
-	var data *Collaboration
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Collaboration
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-remove-a-collaboration
@@ -116,9 +116,9 @@ func (c *Client) RetrieveCollaboration(collaborationId string) (*http.Response, 
 		return nil, nil, err
 	}
 
-	var data *Collaboration
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Collaboration
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-get-pending-collaborations
@@ -135,7 +135,7 @@ func (c *Client) GetPendingCollaborations() (*http.Response, *Collaborations, er
 		return nil, nil, err
 	}
 
-	var data *Collaborations
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Collaborations
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }

@@ -51,9 +51,9 @@ func (c *Client) Me() (*http.Response, *User, error) {
 		return nil, nil, err
 	}
 
-	var data *User
+	var data User
 	resp, err := c.Do(req, &data)
-	return resp, data, err
+	return resp, &data, err
 }
 
 // Docs: https://developers.box.com/docs/#users-move-folder-into-another-folder
@@ -72,9 +72,9 @@ func (c *Client) ChangePrimaryLogin(userID, newLogin string) (*http.Response, *U
 		return nil, nil, err
 	}
 
-	var data *User
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data User
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Docs: https://developers.box.com/docs/#users-get-all-email-aliases-for-a-user
@@ -88,10 +88,10 @@ func (c *Client) EmailAliases(userID string) (*http.Response, []EmailAlias, erro
 		return nil, nil, err
 	}
 
-	var data *CountedEmailAliases
+	var data CountedEmailAliases
 	resp, err := c.Do(req, &data)
 	var aliases []EmailAlias
-	if data != nil {
+	if data.TotalCount != 0 {
 		aliases = data.Entries
 	}
 	return resp, aliases, err
@@ -122,9 +122,9 @@ func (c *Client) AddEmailAlias(userID, email string) (*http.Response, *EmailAlia
 		return nil, nil, err
 	}
 
-	var data *EmailAlias
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data EmailAlias
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Docs: https://developers.box.com/docs/#users-remove-an-email-alias-from-a-user

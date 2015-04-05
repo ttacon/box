@@ -53,9 +53,9 @@ func (c *Client) CreateFolder(name string, parent int) (*http.Response, *Folder,
 		return nil, nil, err
 	}
 
-	var data *Folder
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Folder
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // TODO(ttacon): can these ids be non-integer? if not, why are they returned as
@@ -72,9 +72,9 @@ func (c *Client) GetFolder(folderId string) (*http.Response, *Folder, error) {
 		return nil, nil, err
 	}
 
-	var data *Folder
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Folder
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // TODO(ttacon): return the response for the user to play with if they want
@@ -89,9 +89,9 @@ func (c *Client) GetFolderItems(folderId string) (*http.Response, *ItemCollectio
 		return nil, nil, err
 	}
 
-	var data *ItemCollection
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data ItemCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-update-information-about-a-folder
@@ -127,9 +127,9 @@ func (c *Client) CopyFolder(src, dest, name string) (*http.Response, *Folder, er
 		return nil, nil, err
 	}
 
-	var data *Folder
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Folder
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-create-a-shared-link-for-a-folder
@@ -144,9 +144,9 @@ func (c *Client) GetCollaborations(folderId string) (*http.Response, *Collaborat
 		return nil, nil, err
 	}
 
-	var data *Collaborations
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Collaborations
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#folders-get-the-items-in-the-trash
@@ -161,9 +161,9 @@ func (c *Client) ItemsInTrash(fields []string, limit, offset int) (*http.Respons
 		return nil, nil, err
 	}
 
-	var data *ItemCollection
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data ItemCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#folders-get-a-trashed-folder
@@ -177,9 +177,9 @@ func (c *Client) GetTrashedFolder(folderId string) (*http.Response, *Folder, err
 		return nil, nil, err
 	}
 
-	var data *Folder
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Folder
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#folders-restore-a-trashed-folder
@@ -213,9 +213,9 @@ func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Resp
 		toSerialze,
 	)
 
-	var data *Folder
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Folder
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#folders-permanently-delete-a-trashed-folder

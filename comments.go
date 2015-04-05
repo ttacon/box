@@ -41,9 +41,9 @@ func (c *Client) AddComment(itemType, id, message, taggedMessage string) (*http.
 		return nil, nil, err
 	}
 
-	var data *Comment
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Comment
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#comments-change-a-comments-message
@@ -61,9 +61,9 @@ func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Respons
 		return nil, nil, err
 	}
 
-	var data *Comment
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Comment
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#comments-get-information-about-a-comment
@@ -77,9 +77,9 @@ func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) 
 		return nil, nil, err
 	}
 
-	var data *Comment
-	resp, err := c.Do(req, data)
-	return resp, data, err
+	var data Comment
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
 }
 
 // Documentation: https://developers.box.com/docs/#comments-delete-a-comment
