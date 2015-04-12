@@ -8,7 +8,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"code.google.com/p/goauth2/oauth"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
 )
 
 const (
@@ -18,17 +19,38 @@ const (
 	userAgent = "go-box:v0.0.1"
 )
 
+var (
+	baseURL, _ = url.Parse(BASE_URL)
+)
+
 type Client struct {
-	Trans   *oauth.Transport
+	Client  *http.Client
 	BaseUrl *url.URL
 }
 
-func NewClient(oa *oauth.Transport) (*Client, error) {
-	u, err := url.Parse(BASE_URL)
+type tokenSource oauth2.Token
+
+func (t *tokenSource) Token() (*oauth2.Token, error) {
+	return (*oauth2.Token)(t), nil
+}
+
+type ConfigSource struct {
+	cfg *oauth2.Config
+}
+
+func NewConfigSource(cfg *oauth2.Config) *ConfigSource {
+	return &ConfigSource{
+		cfg: cfg,
+	}
+}
+
+func (c *ConfigSource) NewClient(tok *oauth2.Token) *Client {
+	// TODO(ttacon): allow the config to have deadlines/timeouts
+	// (for the context)?
 	return &Client{
-		Trans:   oa,
-		BaseUrl: u,
-	}, err
+		Client:  c.cfg.Client(context.Background(), tok),
+		BaseUrl: baseURL,
+	}
 }
 
 // NewRequest creates an *http.Request with the given method, url and
@@ -71,7 +93,7 @@ func (c *Client) NewRequest(method, urlStr string, body interface{}) (*http.Requ
 // Do "makes" the request, and if there are no errors and resp is not nil,
 // it attempts to unmarshal the  (json) response body into resp.
 func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, error) {
-	resp, err := c.Trans.Client().Do(req)
+	resp, err := c.Client.Do(req)
 	if err != nil {
 		return nil, err
 	}

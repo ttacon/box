@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"time"
 
-	"code.google.com/p/goauth2/oauth"
 	"github.com/ttacon/box"
 	"github.com/ttacon/pretty"
+	"golang.org/x/oauth2"
 )
 
 var (
@@ -31,30 +30,26 @@ func main() {
 	}
 
 	// Set our OAuth2 configuration up
-	var (
-		config = &oauth.Config{
-			ClientId:     *clientId,
+	var configSource = box.NewConfigSource(
+		&oauth2.Config{
+			ClientID:     *clientId,
 			ClientSecret: *clientSecret,
-			Scope:        "",
-			AuthURL:      "https://www.box.com/api/oauth2/authorize",
-			TokenURL:     "https://www.box.com/api/oauth2/token",
-		}
-
-		tok = &oauth.Transport{
-			Config: config,
-			Token: &oauth.Token{
-				AccessToken:  *accessToken,
-				RefreshToken: *refreshToken,
-				Expiry:       time.Now(), // I do this as box expires tokens each hour
+			Scopes:       nil,
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  "https://app.box.com/api/oauth2/authorize",
+				TokenURL: "https://app.box.com/api/oauth2/token",
 			},
-		}
+			RedirectURL: "http://localhost:8080/handle",
+		},
 	)
-
-	var c, err = box.NewClient(tok)
-	if err != nil {
-		fmt.Println("failed to create client, err: ", err)
-		return
-	}
+	var (
+		tok = &oauth2.Token{
+			TokenType:    "Bearer",
+			AccessToken:  *accessToken,
+			RefreshToken: *refreshToken,
+		}
+		c = configSource.NewClient(tok)
+	)
 
 	resp, file, err := c.GetFile(*fileId)
 	fmt.Println("resp: ", resp)
@@ -62,5 +57,5 @@ func main() {
 	pretty.Print(file)
 
 	// Print out the new tokens for next time
-	fmt.Printf("\n%#v\n", tok.Token)
+	fmt.Printf("\n%#v\n", tok)
 }

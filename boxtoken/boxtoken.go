@@ -5,18 +5,19 @@ import (
 	"fmt"
 	"net/http"
 
-	"code.google.com/p/goauth2/oauth"
+	"golang.org/x/net/context"
+	"golang.org/x/oauth2"
 )
 
 var (
-	config = &oauth.Config{
-		ClientId:     "",
+	config = &oauth2.Config{
+		ClientID:     "",
 		ClientSecret: "",
-		Scope:        "",
-		AuthURL:      "https://www.box.com/api/oauth2/authorize",
-		TokenURL:     "https://www.box.com/api/oauth2/token",
-		// AuthURL:     "http://localhost:8080/authorize",
-		// TokenURL:    "http://localhost:8080/token",
+		Scopes:       nil,
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  "https://app.box.com/api/oauth2/authorize",
+			TokenURL: "https://app.box.com/api/oauth2/token",
+		},
 		RedirectURL: "http://localhost:8080/handle",
 	}
 
@@ -27,7 +28,7 @@ var (
 func main() {
 	flag.Parse()
 
-	config.ClientId = *clientId
+	config.ClientID = *clientId
 	config.ClientSecret = *clientSecret
 
 	http.HandleFunc("/", landing)
@@ -43,11 +44,7 @@ func landing(w http.ResponseWriter, r *http.Request) {
 // The user will be redirected back to this handler, that takes the
 // "code" query parameter and Exchanges it for an access token.
 func handler(w http.ResponseWriter, r *http.Request) {
-	t := &oauth.Transport{Config: config}
-	token, err := t.Exchange(r.FormValue("code"))
+	fmt.Println(r.FormValue("code"))
+	token, err := config.Exchange(context.Background(), r.FormValue("code"))
 	fmt.Println("token: ", token, "\nerr: ", err)
-	// The Transport now has a valid Token. Create an *http.Client
-	// with which we can make authenticated API requests.
-	// ...
-	// btw, r.FormValue("state") == "foo"
 }
