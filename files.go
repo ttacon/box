@@ -9,6 +9,10 @@ import (
 	"os"
 )
 
+type FileService struct {
+	*Client
+}
+
 // TODO(ttacon): reconcile this with Folder for one common struct?
 type File struct {
 	ID                string          `json:"id,omitempty"`
@@ -44,7 +48,7 @@ type FileCollection struct {
 }
 
 // Documentation: https://developer.box.com/docs/#files-get
-func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
+func (c *FileService) GetFile(fileId string) (*http.Response, *File, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s", fileId),
@@ -61,7 +65,7 @@ func (c *Client) GetFile(fileId string) (*http.Response, *File, error) {
 
 // Documentation https://developer.box.com/docs/#files-upload-a-file
 // TODO(ttacon): deal with handling SHA1 headers
-func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCollection, error) {
+func (c *FileService) UploadFile(filePath, parentId string) (*http.Response, *FileCollection, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, nil, err
@@ -126,7 +130,7 @@ func (c *Client) UploadFile(filePath, parentId string) (*http.Response, *FileCol
 }
 
 // Documentation: https://developers.box.com/docs/#files-delete-a-file
-func (c *Client) DeleteFile(fileId string) (*http.Response, error) {
+func (c *FileService) DeleteFile(fileId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/files/%s", fileId),
@@ -140,7 +144,7 @@ func (c *Client) DeleteFile(fileId string) (*http.Response, error) {
 }
 
 // Documentation: https://developers.box.com/docs/#files-copy-a-file
-func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, error) {
+func (c *FileService) CopyFile(fileId, parent, name string) (*http.Response, *File, error) {
 	var bodyData = map[string]interface{}{
 		"parent": map[string]string{
 			"id": parent,
@@ -166,7 +170,7 @@ func (c *Client) CopyFile(fileId, parent, name string) (*http.Response, *File, e
 // yet a download link, or a 302 with the link - this allows the user to
 // decide what to do.
 // Documentation: https://developers.box.com/docs/#files-download-a-file
-func (c *Client) DownloadFile(fileId string) (*http.Response, error) {
+func (c *FileService) DownloadFile(fileId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s/content", fileId),
@@ -181,7 +185,7 @@ func (c *Client) DownloadFile(fileId string) (*http.Response, error) {
 
 // Documentation: https://developers.box.com/docs/#files-view-versions-of-a-file
 // TODO(ttacon): don't use file collection, make actual structs specific to file versions
-func (c *Client) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollection, error) {
+func (c *FileService) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollection, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s/versions", fileId),
@@ -199,7 +203,7 @@ func (c *Client) ViewVersionsOfFile(fileId string) (*http.Response, *FileCollect
 // NOTE: we only return the response as there are many possible responses that we
 // feel the user should have control over
 // Documentation: https://developers.box.com/docs/#files-get-a-thumbnail-for-a-file
-func (c *Client) GetThumbnail(fileId string) (*http.Response, error) {
+func (c *FileService) GetThumbnail(fileId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s/thumbnail.extension", fileId),
@@ -213,7 +217,7 @@ func (c *Client) GetThumbnail(fileId string) (*http.Response, error) {
 }
 
 // Documentation: https://developers.box.com/docs/#files-create-a-shared-link-for-a-file
-func (c *Client) CreateSharedLinkForFile(fileId, access, unsharedAt string, canDownload, canPreview bool) (*http.Response, *File, error) {
+func (c *FileService) CreateSharedLinkForFile(fileId, access, unsharedAt string, canDownload, canPreview bool) (*http.Response, *File, error) {
 	var dataMap = make(map[string]interface{})
 	if len(access) > 0 {
 		dataMap["access"] = access
@@ -251,7 +255,7 @@ func (c *Client) CreateSharedLinkForFile(fileId, access, unsharedAt string, canD
 }
 
 // Documentation: https://developers.box.com/docs/#files-get-a-trashed-file
-func (c *Client) GetTrashedFile(fileId string) (*http.Response, *File, error) {
+func (c *FileService) GetTrashedFile(fileId string) (*http.Response, *File, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s/trash", fileId),
@@ -267,7 +271,7 @@ func (c *Client) GetTrashedFile(fileId string) (*http.Response, *File, error) {
 }
 
 // Documentation: https://developers.box.com/docs/#files-restore-a-trashed-item
-func (c *Client) RestoreTrashedItem(fileId, name, parentId string) (*http.Response, *File, error) {
+func (c *FileService) RestoreTrashedItem(fileId, name, parentId string) (*http.Response, *File, error) {
 	var dataMap = make(map[string]interface{})
 	if len(name) > 0 {
 		dataMap["name"] = name
@@ -293,7 +297,7 @@ func (c *Client) RestoreTrashedItem(fileId, name, parentId string) (*http.Respon
 }
 
 // Documentation: https://developers.box.com/docs/#files-permanently-delete-a-trashed-file
-func (c *Client) PermanentlyDeleteTrashedFile(fileId string) (*http.Response, error) {
+func (c *FileService) PermanentlyDeleteTrashedFile(fileId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/files/%s/trash", fileId),
@@ -307,7 +311,7 @@ func (c *Client) PermanentlyDeleteTrashedFile(fileId string) (*http.Response, er
 }
 
 // Documentation: https://developers.box.com/docs/#files-view-the-comments-on-a-file
-func (c *Client) ViewCommentsOnFile(fileId string) (*http.Response, *CommentCollection, error) {
+func (c *FileService) ViewCommentsOnFile(fileId string) (*http.Response, *CommentCollection, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s/comments", fileId),
@@ -323,7 +327,7 @@ func (c *Client) ViewCommentsOnFile(fileId string) (*http.Response, *CommentColl
 }
 
 // Documentation: https://developers.box.com/docs/#files-get-the-tasks-for-a-file
-func (c *Client) GetTasksForFile(fileId string) (*http.Response, *TaskCollection, error) {
+func (c *FileService) GetTasksForFile(fileId string) (*http.Response, *TaskCollection, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/files/%s/tasks", fileId),

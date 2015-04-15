@@ -109,3 +109,13 @@ func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, err
 	}
 	return resp, err
 }
+
+//////// Service constructors to make life simpler //////////
+
+// FileService returns a an interface to interact with all of the
+// API methods available for manipulating or querying files.
+func (c *Client) FileService() *FileService {
+	return &FileService{
+		Client: c,
+	}
+}

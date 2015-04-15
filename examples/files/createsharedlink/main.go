@@ -51,7 +51,7 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, file, err := c.CreateSharedLinkForFile(*fileId, "open", "", true, true)
+	resp, file, err := c.FileService().CreateSharedLinkForFile(*fileId, "open", "", true, true)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(file)

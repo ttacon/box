@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/ttacon/box"
+	"github.com/ttacon/pretty"
 	"golang.org/x/oauth2"
 )
 
@@ -50,10 +51,11 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, err := c.DeleteFile(*fileId)
+	resp, file, err := c.FileService().GetFile(*fileId)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
+	pretty.Print(file)
 
 	// Print out the new tokens for next time
-	fmt.Printf("%#v\n", tok)
+	fmt.Printf("\n%#v\n", tok)
 }

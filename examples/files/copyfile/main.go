@@ -17,6 +17,8 @@ var (
 	refreshToken = flag.String("rtok", "", "Refresh Token")
 
 	fileId = flag.String("fid", "", "File (ID) to grab")
+	parent = flag.String("pid", "", "Parent (ID) to copy the file to")
+	name   = flag.String("n", "", "Name to give to the new file copy")
 )
 
 func main() {
@@ -24,7 +26,7 @@ func main() {
 
 	if len(*clientId) == 0 || len(*clientSecret) == 0 ||
 		len(*accessToken) == 0 || len(*refreshToken) == 0 ||
-		len(*fileId) == 0 {
+		len(*fileId) == 0 || len(*parent) == 0 || len(*name) == 0 {
 		fmt.Println("unfortunately all flags must be provided")
 		return
 	}
@@ -51,11 +53,11 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, file, err := c.GetFile(*fileId)
+	resp, file, err := c.FileService().CopyFile(*fileId, *parent, *name)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(file)
 
 	// Print out the new tokens for next time
-	fmt.Printf("\n%#v\n", tok)
+	fmt.Printf("%#v\n", tok)
 }

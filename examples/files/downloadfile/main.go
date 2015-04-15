@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"code.google.com/p/goauth2/oauth"
+	"github.com/kr/pretty"
 	"github.com/ttacon/box"
-	"github.com/ttacon/pretty"
 )
 
 var (
@@ -50,13 +50,12 @@ func main() {
 		}
 	)
 
-	var c = &box.Client{
-		Trans: tok,
-	}
-	resp, file, err := c.GetTrashedFile(*fileId)
-	fmt.Println("resp: ", resp)
+	var c = &box.Client{tok}
+	resp, err := c.FileService().DownloadFile(*fileId)
+	pretty.Print(resp)
 	fmt.Println("err: ", err)
-	pretty.Print(file)
+	// TODO(ttacon): actually download the file here for the example
+	// to be more complete
 
 	// Print out the new tokens for next time
 	fmt.Printf("%#v\n", tok.Token)
