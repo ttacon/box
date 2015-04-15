@@ -30,19 +30,19 @@ func main() {
 	}
 
 	// Set our OAuth2 configuration up
-	var configSource = box.NewConfigSource(
-		&oauth2.Config{
-			ClientID:     *clientId,
-			ClientSecret: *clientSecret,
-			Scopes:       nil,
-			Endpoint: oauth2.Endpoint{
-				AuthURL:  "https://app.box.com/api/oauth2/authorize",
-				TokenURL: "https://app.box.com/api/oauth2/token",
-			},
-			RedirectURL: "http://localhost:8080/handle",
-		},
-	)
 	var (
+		configSource = box.NewConfigSource(
+			&oauth2.Config{
+				ClientID:     *clientId,
+				ClientSecret: *clientSecret,
+				Scopes:       nil,
+				Endpoint: oauth2.Endpoint{
+					AuthURL:  "https://app.box.com/api/oauth2/authorize",
+					TokenURL: "https://app.box.com/api/oauth2/token",
+				},
+				RedirectURL: "http://localhost:8080/handle",
+			},
+		)
 		tok = &oauth2.Token{
 			TokenType:    "Bearer",
 			AccessToken:  *accessToken,
