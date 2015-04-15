@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type FolderService struct {
+	*Client
+}
+
 // Documentation: https://developers.box.com/docs/#folders-folder-object
 type Folder struct {
 	ID                string          `json:"id,omitempty"`
@@ -36,7 +40,7 @@ type Folder struct {
 // or we should check it? it's more flexible if we let the user decide what
 // they view as an error
 // Documentation: https://developers.box.com/docs/#folders-create-a-new-folder
-func (c *Client) CreateFolder(name string, parent int) (*http.Response, *Folder, error) {
+func (c *FolderService) CreateFolder(name string, parent int) (*http.Response, *Folder, error) {
 	var body = map[string]interface{}{
 		"name": name,
 		"parent": map[string]int{
@@ -62,7 +66,7 @@ func (c *Client) CreateFolder(name string, parent int) (*http.Response, *Folder,
 // strings in the API
 // TODO(ttacon): return the response for the user to play with if they want
 // Documentation: https://developers.box.com/docs/#folders-get-information-about-a-folder
-func (c *Client) GetFolder(folderId string) (*http.Response, *Folder, error) {
+func (c *FolderService) GetFolder(folderId string) (*http.Response, *Folder, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/folders/%s", folderId),
@@ -79,7 +83,7 @@ func (c *Client) GetFolder(folderId string) (*http.Response, *Folder, error) {
 
 // TODO(ttacon): return the response for the user to play with if they want
 // Documentation: https://developers.box.com/docs/#folders-retrieve-a-folders-items
-func (c *Client) GetFolderItems(folderId string) (*http.Response, *ItemCollection, error) {
+func (c *FolderService) GetFolderItems(folderId string) (*http.Response, *ItemCollection, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/folders/%s/items", folderId),
@@ -96,7 +100,7 @@ func (c *Client) GetFolderItems(folderId string) (*http.Response, *ItemCollectio
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-update-information-about-a-folder
 // Documentation: https://developers.box.com/docs/#folders-delete-a-folder
-func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, error) {
+func (c *FolderService) DeleteFolder(folderId string, recursive bool) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/folders/%s?recursive=%b", folderId, recursive),
@@ -110,7 +114,7 @@ func (c *Client) DeleteFolder(folderId string, recursive bool) (*http.Response, 
 }
 
 // Documentation: https://developers.box.com/docs/#folders-copy-a-folder
-func (c *Client) CopyFolder(src, dest, name string) (*http.Response, *Folder, error) {
+func (c *FolderService) CopyFolder(src, dest, name string) (*http.Response, *Folder, error) {
 	var body = map[string]interface{}{
 		"parent": map[string]string{
 			"id": dest,
@@ -134,7 +138,7 @@ func (c *Client) CopyFolder(src, dest, name string) (*http.Response, *Folder, er
 
 // TODO(ttacon): https://developers.box.com/docs/#folders-create-a-shared-link-for-a-folder
 // Documentation: https://developers.box.com/docs/#folders-view-a-folders-collaborations
-func (c *Client) GetCollaborations(folderId string) (*http.Response, *Collaborations, error) {
+func (c *FolderService) GetCollaborations(folderId string) (*http.Response, *Collaborations, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/folders/%s/collaborations", folderId),
@@ -150,7 +154,7 @@ func (c *Client) GetCollaborations(folderId string) (*http.Response, *Collaborat
 }
 
 // Documentation: https://developers.box.com/docs/#folders-get-the-items-in-the-trash
-func (c *Client) ItemsInTrash(fields []string, limit, offset int) (*http.Response, *ItemCollection, error) {
+func (c *FolderService) ItemsInTrash(fields []string, limit, offset int) (*http.Response, *ItemCollection, error) {
 	// TODO(ttacon): actually use fields, limit and offset lol
 	req, err := c.NewRequest(
 		"GET",
@@ -167,7 +171,7 @@ func (c *Client) ItemsInTrash(fields []string, limit, offset int) (*http.Respons
 }
 
 // Documentation: https://developers.box.com/docs/#folders-get-a-trashed-folder
-func (c *Client) GetTrashedFolder(folderId string) (*http.Response, *Folder, error) {
+func (c *FolderService) GetTrashedFolder(folderId string) (*http.Response, *Folder, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/folders/%s/trash", folderId),
@@ -186,7 +190,7 @@ func (c *Client) GetTrashedFolder(folderId string) (*http.Response, *Folder, err
 // NOTES:
 //     -name and parent id are not required unless the previous parent folder no
 //      longer exists or a folder with the previous name exists
-func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Response, *Folder, error) {
+func (c *FolderService) RestoreTrashedFolder(folderId, name, parent string) (*http.Response, *Folder, error) {
 	var toSerialze map[string]interface{}
 	if len(name) > 0 {
 		toSerialze = map[string]interface{}{
@@ -219,7 +223,7 @@ func (c *Client) RestoreTrashedFolder(folderId, name, parent string) (*http.Resp
 }
 
 // Documentation: https://developers.box.com/docs/#folders-permanently-delete-a-trashed-folder
-func (c *Client) PermanentlyDeleteTrashedFolder(folderId string) (*http.Response, error) {
+func (c *FolderService) PermanentlyDeleteTrashedFolder(folderId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/folders/%s/trash", folderId),
