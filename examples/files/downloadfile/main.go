@@ -51,10 +51,11 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, fColl, err := c.ViewVersionsOfFile(*fileId)
-	fmt.Println("resp: ", resp)
+	resp, err := c.FileService().DownloadFile(*fileId)
+	pretty.Print(resp)
 	fmt.Println("err: ", err)
-	pretty.Print(fColl)
+	// TODO(ttacon): actually download the file here for the example
+	// to be more complete
 
 	// Print out the new tokens for next time
 	fmt.Printf("%#v\n", tok)

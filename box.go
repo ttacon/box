@@ -109,3 +109,28 @@ func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, err
 	}
 	return resp, err
 }
+
+//////// Service constructors to make life simpler //////////
+
+// FileService returns an interface to interact with all of the
+// API methods available for manipulating or querying files.
+func (c *Client) FileService() *FileService {
+	return &FileService{
+		Client: c,
+	}
+}
+
+// FolderService returns an interface through which one can interact
+// with all the folder manipulation and querying functionality
+// Box exposes in their API.
+func (c *Client) FolderService() *FolderService {
+	return &FolderService{
+		Client: c,
+	}
+}
+
+func (c *Client) CollaborationService() *CollaborationService {
+	return &CollaborationService{
+		Client: c,
+	}
+}

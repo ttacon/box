@@ -15,19 +15,10 @@ var (
 
 	accessToken  = flag.String("atok", "", "Access Token")
 	refreshToken = flag.String("rtok", "", "Refresh Token")
-
-	fileId = flag.String("fid", "", "File (ID) to grab")
 )
 
 func main() {
 	flag.Parse()
-
-	if len(*clientId) == 0 || len(*clientSecret) == 0 ||
-		len(*accessToken) == 0 || len(*refreshToken) == 0 ||
-		len(*fileId) == 0 {
-		fmt.Println("unfortunately all flags must be provided")
-		return
-	}
 
 	// Set our OAuth2 configuration up
 	var (
@@ -51,11 +42,11 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, file, err := c.GetFile(*fileId)
+	resp, folder, err := c.FolderService().GetTrashedFolder("2303056557")
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
-	pretty.Print(file)
+	pretty.Print(folder)
 
 	// Print out the new tokens for next time
-	fmt.Printf("\n%#v\n", tok)
+	fmt.Printf("%#v\n", tok)
 }

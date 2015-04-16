@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/ttacon/box"
+	"github.com/ttacon/pretty"
 	"golang.org/x/oauth2"
 )
 
@@ -14,19 +15,10 @@ var (
 
 	accessToken  = flag.String("atok", "", "Access Token")
 	refreshToken = flag.String("rtok", "", "Refresh Token")
-
-	fileId = flag.String("fid", "", "File (ID) to grab")
 )
 
 func main() {
 	flag.Parse()
-
-	if len(*clientId) == 0 || len(*clientSecret) == 0 ||
-		len(*accessToken) == 0 || len(*refreshToken) == 0 ||
-		len(*fileId) == 0 {
-		fmt.Println("unfortunately all flags must be provided")
-		return
-	}
 
 	// Set our OAuth2 configuration up
 	var (
@@ -50,9 +42,10 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, err := c.DeleteFile(*fileId)
+	resp, items, err := c.FolderService().ItemsInTrash(nil, 0, 0)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
+	pretty.Print(items)
 
 	// Print out the new tokens for next time
 	fmt.Printf("%#v\n", tok)
