@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type CollaborationService struct {
+	*Client
+}
+
 // TODO(ttacon):some of these fields pop up everywhere, make
 // common struct and anonymously extend the others with it?
 // Documentation: https://developers.box.com/docs/#collaborations
@@ -28,7 +32,7 @@ type Collaborations struct {
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-add-a-collaboration
-func (c *Client) AddCollaboration(
+func (c *CollaborationService) AddCollaboration(
 	itemId,
 	itemType,
 	accessibleId,
@@ -68,7 +72,7 @@ func (c *Client) AddCollaboration(
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-edit-a-collaboration
-func (c *Client) EditCollaboration(collaborationId, role, status string) (*http.Response, *Collaboration, error) {
+func (c *CollaborationService) EditCollaboration(collaborationId, role, status string) (*http.Response, *Collaboration, error) {
 	var dataMap = make(map[string]interface{})
 	if len(role) > 0 {
 		dataMap["role"] = role
@@ -92,7 +96,7 @@ func (c *Client) EditCollaboration(collaborationId, role, status string) (*http.
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-remove-a-collaboration
-func (c *Client) RemoveCollaboration(collaborationId string) (*http.Response, error) {
+func (c *CollaborationService) RemoveCollaboration(collaborationId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/collaborations/%s", collaborationId),
@@ -106,7 +110,7 @@ func (c *Client) RemoveCollaboration(collaborationId string) (*http.Response, er
 }
 
 // Documentation: https://developers.box.com/docs/#collaborations-retrieve-a-collaboration
-func (c *Client) RetrieveCollaboration(collaborationId string) (*http.Response, *Collaboration, error) {
+func (c *CollaborationService) RetrieveCollaboration(collaborationId string) (*http.Response, *Collaboration, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/collaborations/%s", collaborationId),
@@ -125,7 +129,7 @@ func (c *Client) RetrieveCollaboration(collaborationId string) (*http.Response, 
 // NOTE(ttacon): not doing to add param since it's just calling the first url with an explicit
 // query string (that never changes, why isn't it an actual route then, or bundled into the
 // documentation of the first one?)
-func (c *Client) GetPendingCollaborations() (*http.Response, *Collaborations, error) {
+func (c *CollaborationService) GetPendingCollaborations() (*http.Response, *Collaborations, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/collaborations?status=pending"), // TODO(ttacon): remove Sprintf call

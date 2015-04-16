@@ -128,3 +128,9 @@ func (c *Client) FolderService() *FolderService {
 		Client: c,
 	}
 }
+
+func (c *Client) CollaborationService() *CollaborationService {
+	return &CollaborationService{
+		Client: c,
+	}
+}
