@@ -1,7 +1,7 @@
 box
 ===
 
-golang API for box
+golang API for box [![Build Status](https://travis-ci.org/ttacon/box.svg?branch=master)](https://travis-ci.org/ttacon/box)
 
 status
 =====
