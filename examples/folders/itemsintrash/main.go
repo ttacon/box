@@ -42,7 +42,7 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, items, err := c.ItemsInTrash(nil, 0, 0)
+	resp, items, err := c.FolderService().ItemsInTrash(nil, 0, 0)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(items)

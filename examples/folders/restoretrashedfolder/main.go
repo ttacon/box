@@ -50,7 +50,7 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, items, err := c.RestoreTrashedFolder(*folderId, "", "")
+	resp, items, err := c.FolderService().RestoreTrashedFolder(*folderId, "", "")
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(items)

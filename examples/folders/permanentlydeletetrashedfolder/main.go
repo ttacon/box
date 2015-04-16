@@ -50,7 +50,7 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, err := c.PermanentlyDeleteTrashedFolder(*folderId)
+	resp, err := c.FolderService().PermanentlyDeleteTrashedFolder(*folderId)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 

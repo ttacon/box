@@ -42,7 +42,7 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, folder, err := c.GetTrashedFolder("2303056557")
+	resp, folder, err := c.FolderService().GetTrashedFolder("2303056557")
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(folder)
