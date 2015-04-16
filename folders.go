@@ -15,7 +15,7 @@ type Folder struct {
 	Type              string          `json:"type"`
 	Description       string          `json:"description"`
 	Size              int             `json:"size"`
-	CreateBy          *Item           `json:"created_by"`
+	CreatedBy         *Item           `json:"created_by"`
 	ModifiedBy        *Item           `json:"modified_by"`
 	TrashedAt         *string         `json:"trashed_at"`          // TODO(ttacon): change to time.Time
 	ContentModifiedAt *string         `json:"content_modified_at"` // TODO(ttacon): change to time.Time
