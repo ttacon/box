@@ -3,11 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"time"
 
-	"code.google.com/p/goauth2/oauth"
-	"github.com/kr/pretty"
 	"github.com/ttacon/box"
+	"github.com/ttacon/pretty"
+	"golang.org/x/oauth2"
 )
 
 var (
@@ -32,25 +31,25 @@ func main() {
 
 	// Set our OAuth2 configuration up
 	var (
-		config = &oauth.Config{
-			ClientId:     *clientId,
-			ClientSecret: *clientSecret,
-			Scope:        "",
-			AuthURL:      "https://www.box.com/api/oauth2/authorize",
-			TokenURL:     "https://www.box.com/api/oauth2/token",
-		}
-
-		tok = &oauth.Transport{
-			Config: config,
-			Token: &oauth.Token{
-				AccessToken:  *accessToken,
-				RefreshToken: *refreshToken,
-				Expiry:       time.Now(), // I do this as box expires tokens each hour
+		configSource = box.NewConfigSource(
+			&oauth2.Config{
+				ClientID:     *clientId,
+				ClientSecret: *clientSecret,
+				Scopes:       nil,
+				Endpoint: oauth2.Endpoint{
+					AuthURL:  "https://app.box.com/api/oauth2/authorize",
+					TokenURL: "https://app.box.com/api/oauth2/token",
+				},
+				RedirectURL: "http://localhost:8080/handle",
 			},
+		)
+		tok = &oauth2.Token{
+			TokenType:    "Bearer",
+			AccessToken:  *accessToken,
+			RefreshToken: *refreshToken,
 		}
+		c = configSource.NewClient(tok)
 	)
-
-	var c = &box.Client{tok}
 
 	resp, folder, err := c.FileService().UploadFile(*fileName, "0")
 	fmt.Println("resp: ", resp)
@@ -58,5 +57,5 @@ func main() {
 	pretty.Print(folder)
 
 	// Print out the new tokens for next time
-	fmt.Printf("%#v\n", tok.Token)
+	fmt.Printf("%#v\n", tok)
 }
