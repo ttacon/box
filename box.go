@@ -134,3 +134,27 @@ func (c *Client) CollaborationService() *CollaborationService {
 		Client: c,
 	}
 }
+
+func (c *Client) CommentService() *CommentService {
+	return &CommentService{
+		Client: c,
+	}
+}
+
+func (c *Client) GroupService() *GroupService {
+	return &GroupService{
+		Client: c,
+	}
+}
+
+func (c *Client) TaskService() *TaskService {
+	return &TaskService{
+		Client: c,
+	}
+}
+
+func (c *Client) UserService() *UserService {
+	return &UserService{
+		Client: c,
+	}
+}

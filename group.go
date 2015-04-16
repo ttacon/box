@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type GroupService struct {
+	*Client
+}
+
 type Group struct {
 	Type       string `json:"type"`
 	ID         string `json:"id"`
@@ -22,7 +26,7 @@ type GroupCollection struct {
 
 // Docs: https://developers.box.com/docs/#groups-get-all-groups
 // TODO(ttacon): test it
-func (c *Client) Groups() (*http.Response, []Group, error) {
+func (c *GroupService) Groups() (*http.Response, []Group, error) {
 	req, err := c.NewRequest(
 		"GET",
 		"/groups",
@@ -43,7 +47,7 @@ func (c *Client) Groups() (*http.Response, []Group, error) {
 
 // Docs: https://developers.box.com/docs/#groups-create-a-group
 // TODO(ttacon): test it
-func (c *Client) CreateGroup(name string) (*http.Response, *Group, error) {
+func (c *GroupService) CreateGroup(name string) (*http.Response, *Group, error) {
 	req, err := c.NewRequest(
 		"POST",
 		"/groups",
@@ -62,7 +66,7 @@ func (c *Client) CreateGroup(name string) (*http.Response, *Group, error) {
 
 // Docs: https://developers.box.com/docs/#update-a-group
 // TODO(ttacon): test it
-func (c *Client) UpdateGroup(groupID, name string) (*http.Response, *Group, error) {
+func (c *GroupService) UpdateGroup(groupID, name string) (*http.Response, *Group, error) {
 	req, err := c.NewRequest(
 		"PUT",
 		fmt.Sprintf("/groups/%s", groupID),
@@ -81,7 +85,7 @@ func (c *Client) UpdateGroup(groupID, name string) (*http.Response, *Group, erro
 
 // Docs: https://developers.box.com/docs/#delete-a-group
 // TODO(ttacon): test it
-func (c *Client) DeleteGroup(groupID string) (*http.Response, bool, error) {
+func (c *GroupService) DeleteGroup(groupID string) (*http.Response, bool, error) {
 	req, err := c.NewRequest(
 		"PUT",
 		fmt.Sprintf("/groups/%s", groupID),

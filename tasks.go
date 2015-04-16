@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type TaskService struct {
+	*Client
+}
+
 type TaskCollection struct {
 	TotalCount int     `json:"total_count"`
 	Entries    []*Task `json:"entries"`
@@ -45,7 +49,7 @@ type TaskAssignment struct {
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task
-func (c *Client) CreateTask(itemId, itemType, action, message, due_at string) (*http.Response, *Task, error) {
+func (c *TaskService) CreateTask(itemId, itemType, action, message, due_at string) (*http.Response, *Task, error) {
 	var dataMap = map[string]interface{}{
 		"item": map[string]string{
 			"id":   itemId,
@@ -78,7 +82,7 @@ func (c *Client) CreateTask(itemId, itemType, action, message, due_at string) (*
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-a-task
-func (c *Client) GetTask(taskId string) (*http.Response, *Task, error) {
+func (c *TaskService) GetTask(taskId string) (*http.Response, *Task, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/tasks/%s", taskId),
@@ -94,7 +98,7 @@ func (c *Client) GetTask(taskId string) (*http.Response, *Task, error) {
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-update-a-task
-func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Response, *Task, error) {
+func (c *TaskService) UpdateTask(taskId, action, message, due_at string) (*http.Response, *Task, error) {
 	var dataMap = make(map[string]interface{})
 	if len(action) > 0 {
 		dataMap["action"] = action
@@ -121,7 +125,7 @@ func (c *Client) UpdateTask(taskId, action, message, due_at string) (*http.Respo
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-delete-a-task
-func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
+func (c *TaskService) DeleteTask(taskId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/tasks/%s", taskId),
@@ -136,7 +140,7 @@ func (c *Client) DeleteTask(taskId string) (*http.Response, error) {
 
 // Documentation: https://developers.box.com/docs/#tasks-get-the-assignments-for-a-task
 // TODO(ttacon): rename when add per resource services
-func (c *Client) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssignmentCollection, error) {
+func (c *TaskService) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssignmentCollection, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/tasks/%s/assignments", taskId),
@@ -152,7 +156,7 @@ func (c *Client) GetAssignmentsForTask(taskId string) (*http.Response, *TaskAssi
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-create-a-task-assignment
-func (c *Client) CreateTaskAssignment(taskId, taskType, assignToId, assignToLogin string) (*http.Response, *TaskAssignment, error) {
+func (c *TaskService) CreateTaskAssignment(taskId, taskType, assignToId, assignToLogin string) (*http.Response, *TaskAssignment, error) {
 	var dataMap = map[string]map[string]string{
 		"task": map[string]string{
 			"id":   taskId,
@@ -182,7 +186,7 @@ func (c *Client) CreateTaskAssignment(taskId, taskType, assignToId, assignToLogi
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-get-a-task-assignment
-func (c *Client) GetTaskAssignment(taskAssignmentId string) (*http.Response, *TaskAssignment, error) {
+func (c *TaskService) GetTaskAssignment(taskAssignmentId string) (*http.Response, *TaskAssignment, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/task_assignments/%s", taskAssignmentId),
@@ -198,7 +202,7 @@ func (c *Client) GetTaskAssignment(taskAssignmentId string) (*http.Response, *Ta
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-delete-a-task-assignment
-func (c *Client) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, error) {
+func (c *TaskService) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/task_assignments/%s", taskAssignmentId),
@@ -212,7 +216,7 @@ func (c *Client) DeleteTaskAssignment(taskAssignmentId string) (*http.Response, 
 }
 
 // Documentation: https://developers.box.com/docs/#tasks-update-a-task-assignment
-func (c *Client) UpdateTaskAssignment(taskAssignmentId, message, resolution_state string) (*http.Response, *TaskAssignment, error) {
+func (c *TaskService) UpdateTaskAssignment(taskAssignmentId, message, resolution_state string) (*http.Response, *TaskAssignment, error) {
 	var dataMap = make(map[string]string)
 	if len(message) > 0 {
 		dataMap["message"] = message

@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type UserService struct {
+	*Client
+}
+
 // NOTE(ttacon): the majority of these functions are Enterprise specific and I don't
 // have an enterprise account to test with so... I guess I could just add them
 // and hope for the best? (lulz)
@@ -41,7 +45,7 @@ type User struct {
 }
 
 // Documentation: https://developers.box.com/docs/#users-get-the-current-users-information
-func (c *Client) Me() (*http.Response, *User, error) {
+func (c *UserService) Me() (*http.Response, *User, error) {
 	req, err := c.NewRequest(
 		"GET",
 		"/users/me",
@@ -60,7 +64,7 @@ func (c *Client) Me() (*http.Response, *User, error) {
 // TODO(ttacon): do it
 
 // Docs: https://developers.box.com/docs/#users-changing-a-users-primary-login
-func (c *Client) ChangePrimaryLogin(userID, newLogin string) (*http.Response, *User, error) {
+func (c *UserService) ChangePrimaryLogin(userID, newLogin string) (*http.Response, *User, error) {
 	req, err := c.NewRequest(
 		"PUT",
 		fmt.Sprintf("/users/%s", userID),
@@ -78,7 +82,7 @@ func (c *Client) ChangePrimaryLogin(userID, newLogin string) (*http.Response, *U
 }
 
 // Docs: https://developers.box.com/docs/#users-get-all-email-aliases-for-a-user
-func (c *Client) EmailAliases(userID string) (*http.Response, []EmailAlias, error) {
+func (c *UserService) EmailAliases(userID string) (*http.Response, []EmailAlias, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/users/%s/email_aliases", userID),
@@ -110,7 +114,7 @@ type EmailAlias struct {
 }
 
 // Docs: https://developers.box.com/docs/#users-add-an-email-alias-for-a-user
-func (c *Client) AddEmailAlias(userID, email string) (*http.Response, *EmailAlias, error) {
+func (c *UserService) AddEmailAlias(userID, email string) (*http.Response, *EmailAlias, error) {
 	req, err := c.NewRequest(
 		"POST",
 		fmt.Sprintf("/users/%s/email_aliases", userID),
@@ -128,7 +132,7 @@ func (c *Client) AddEmailAlias(userID, email string) (*http.Response, *EmailAlia
 }
 
 // Docs: https://developers.box.com/docs/#users-remove-an-email-alias-from-a-user
-func (c *Client) DeletEmailAlias(userID, emailAliasID string) (*http.Response, bool, error) {
+func (c *UserService) DeletEmailAlias(userID, emailAliasID string) (*http.Response, bool, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/users/%s/email_aliases/%s", userID, emailAliasID),

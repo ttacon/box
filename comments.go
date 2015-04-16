@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+type CommentService struct {
+	*Client
+}
+
 type CommentCollection struct {
 	TotalCount int        `json:"total_count"`
 	Entries    []*Comment `json:"entries"`
@@ -22,7 +26,7 @@ type Comment struct {
 }
 
 // Documentation: https://developers.box.com/docs/#comments-add-a-comment-to-an-item
-func (c *Client) AddComment(itemType, id, message, taggedMessage string) (*http.Response, *Comment, error) {
+func (c *CommentService) AddComment(itemType, id, message, taggedMessage string) (*http.Response, *Comment, error) {
 	var dataMap = map[string]interface{}{
 		"item": map[string]string{
 			"type": itemType,
@@ -47,7 +51,7 @@ func (c *Client) AddComment(itemType, id, message, taggedMessage string) (*http.
 }
 
 // Documentation: https://developers.box.com/docs/#comments-change-a-comments-message
-func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Response, *Comment, error) {
+func (c *CommentService) ChangeCommentsMessage(commendId, message string) (*http.Response, *Comment, error) {
 	var dataMap = map[string]string{
 		"message": message,
 	}
@@ -67,7 +71,7 @@ func (c *Client) ChangeCommentsMessage(commendId, message string) (*http.Respons
 }
 
 // Documentation: https://developers.box.com/docs/#comments-get-information-about-a-comment
-func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) {
+func (c *CommentService) GetComment(commentId string) (*http.Response, *Comment, error) {
 	req, err := c.NewRequest(
 		"GET",
 		fmt.Sprintf("/comments/%s", commentId),
@@ -83,7 +87,7 @@ func (c *Client) GetComment(commentId string) (*http.Response, *Comment, error) 
 }
 
 // Documentation: https://developers.box.com/docs/#comments-delete-a-comment
-func (c *Client) DeleteComment(commentId string) (*http.Response, error) {
+func (c *CommentService) DeleteComment(commentId string) (*http.Response, error) {
 	req, err := c.NewRequest(
 		"DELETE",
 		fmt.Sprintf("/comments/%s", commentId),
