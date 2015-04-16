@@ -145,3 +145,23 @@ func (c *UserService) DeletEmailAlias(userID, emailAliasID string) (*http.Respon
 	resp, err := c.Do(req, nil)
 	return resp, resp.StatusCode == 204, err
 }
+
+type Users struct {
+	TotalCount int    `json:"total_count"`
+	Entries    []User `json:"entries"`
+}
+
+func (c *UserService) GetEnterpriseUsers() (*http.Response, *Users, error) {
+	req, err := c.NewRequest(
+		"GET",
+		"/users",
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data Users
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
+}
