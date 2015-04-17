@@ -158,3 +158,9 @@ func (c *Client) UserService() *UserService {
 		Client: c,
 	}
 }
+
+func (c *Client) EventService() *EventService {
+	return &EventService{
+		Client: c,
+	}
+}
