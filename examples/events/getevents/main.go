@@ -48,11 +48,14 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, eventCollection, err := c.EventService().Events()
+	resp, eventCollection, err := c.EventService().Events(box.EventQueryOptions{
+		StreamPosition: "0",
+		Limit:          1,
+	})
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(eventCollection)
-	fmt.Println("# events: ", len(eventCollection.Entries))
+	fmt.Println("\n# events: ", len(eventCollection.Entries))
 
 	// Print out the new tokens for next time
 	fmt.Printf("\n%#v\n", tok)

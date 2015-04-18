@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+
+	"github.com/google/go-querystring/query"
 )
 
 type EventService struct {
@@ -31,10 +33,24 @@ type EventCollection struct {
 	NextStreamPosition int      `json:"next_stream_position"`
 }
 
-func (e *EventService) Events() (*http.Response, *EventCollection, error) {
+type EventQueryOptions struct {
+	StreamPosition string
+	StreamType     string
+	Limit          int
+}
+
+// Events retrieves events for the currently authenticated user.
+//
+// See: https://developers.box.com/docs/#events-get-events-for-a-user
+func (e *EventService) Events(options EventQueryOptions) (*http.Response, *EventCollection, error) {
+	queryString, err := query.Values(options)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	req, err := e.NewRequest(
 		"GET",
-		"/events",
+		"/events?"+queryString.Encode(),
 		nil,
 	)
 	if err != nil {
@@ -46,6 +62,9 @@ func (e *EventService) Events() (*http.Response, *EventCollection, error) {
 		return resp, nil, err
 	}
 	for _, eve := range data.Entries {
+		if eve.Source == nil {
+			continue
+		}
 		if err = finishParsing(eve); err != nil {
 			return resp, nil, err
 		}
