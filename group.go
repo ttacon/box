@@ -151,6 +151,7 @@ func (g *GroupService) Membership(membershipEntryID string) (*http.Response, *Me
 	return resp, &membership, err
 }
 
+// Documentation: https://developers.box.com/docs/#groups-add-a-member-to-a-group
 func (g *GroupService) AddUserToGroup(uID, gID, role string) (*http.Response, *Membership, error) {
 	// try to be nice about errors
 	if len(uID) == 0 {
@@ -175,6 +176,24 @@ func (g *GroupService) AddUserToGroup(uID, gID, role string) (*http.Response, *M
 		"POST",
 		"/group_memberships",
 		toSend,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var membership Membership
+	resp, err := g.Do(req, &membership)
+	return resp, &membership, err
+}
+
+// Documentation: https://developers.box.com/docs/#groups-update-a-group-membership
+func (g *GroupService) UpdateMembership(membershipID, role string) (*http.Response, *Membership, error) {
+	req, err := g.NewRequest(
+		"PUT",
+		fmt.Sprintf("/group_memberships/%s", membershipID),
+		map[string]string{
+			"role": role,
+		},
 	)
 	if err != nil {
 		return nil, nil, err
