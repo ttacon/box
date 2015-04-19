@@ -28,6 +28,8 @@ type Collaboration struct {
 
 type Collaborations struct {
 	TotalCount int `json:"total_count"`
+	Offset     int `json:"offset"`
+	Limit      int `json:"limit"`
 	Entries    []*Collaboration
 }
 

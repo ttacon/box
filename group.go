@@ -217,3 +217,19 @@ func (g *GroupService) DeleteMembership(membershipID string) (*http.Response, er
 
 	return g.Do(req, nil)
 }
+
+// Documentation: https://developers.box.com/docs/#get-all-collaborations-for-a-group
+func (g *GroupService) GroupCollaborations(groupID string) (*http.Response, *Collaborations, error) {
+	req, err := g.NewRequest(
+		"GET",
+		fmt.Sprintf("/groups/%s/collaborations", groupID),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var collaborations Collaborations
+	resp, err := g.Do(req, &collaborations)
+	return resp, &collaborations, err
+}
