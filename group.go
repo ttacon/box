@@ -1,6 +1,7 @@
 package box
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -140,6 +141,40 @@ func (g *GroupService) Membership(membershipEntryID string) (*http.Response, *Me
 		"GET",
 		fmt.Sprintf("/group_memberships/%s", membershipEntryID),
 		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var membership Membership
+	resp, err := g.Do(req, &membership)
+	return resp, &membership, err
+}
+
+func (g *GroupService) AddUserToGroup(uID, gID, role string) (*http.Response, *Membership, error) {
+	// try to be nice about errors
+	if len(uID) == 0 {
+		return nil, nil, errors.New("must provide user ID")
+	} else if len(gID) == 0 {
+		return nil, nil, errors.New("must provide group ID")
+	}
+
+	var toSend = map[string]interface{}{
+		"user": map[string]string{
+			"id": uID,
+		},
+		"group": map[string]string{
+			"id": gID,
+		},
+	}
+	if len(role) > 0 {
+		toSend["role"] = role
+	}
+
+	req, err := g.NewRequest(
+		"POST",
+		"/group_memberships",
+		toSend,
 	)
 	if err != nil {
 		return nil, nil, err
