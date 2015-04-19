@@ -57,7 +57,7 @@ func main() {
 	fmt.Printf("\n%#v\n", tok)
 
 	connInfo := longPollInfo.Entries[0]
-	resp, event, _, err := c.EventService().ListenForEvent(connInfo, "")
+	resp, event, err := c.EventService().ListenForEvent(connInfo, "")
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Println(event)
