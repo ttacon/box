@@ -165,3 +165,18 @@ func (c *UserService) GetEnterpriseUsers() (*http.Response, *Users, error) {
 	resp, err := c.Do(req, &data)
 	return resp, &data, err
 }
+
+func (c *UserService) Membership(userID string) (*http.Response, *MembershipCollection, error) {
+	req, err := c.NewRequest(
+		"GET",
+		fmt.Sprintf("/users/%s/memberships", userID),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data MembershipCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
+}
