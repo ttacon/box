@@ -99,3 +99,38 @@ func (c *GroupService) DeleteGroup(groupID string) (*http.Response, bool, error)
 	resp, err := c.Do(req, &data)
 	return resp, resp.StatusCode == 204, err
 }
+
+// Documentation: https://developers.box.com/docs/#groups-get-the-membership-list-for-a-group
+func (g *GroupService) ListMembership(groupID string) (*http.Response, *MembershipCollection, error) {
+	req, err := g.NewRequest(
+		"GET",
+		fmt.Sprintf("/groups/%s/memberships", groupID),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var membershipCollection MembershipCollection
+	resp, err := g.Do(req, &membershipCollection)
+	return resp, &membershipCollection, err
+}
+
+type CollectionInfo struct {
+	TotalCount int `json:"total_count"`
+	Offset     int `json:"offset"`
+	Limit      int `json:"limit"`
+}
+
+type Membership struct {
+	Type  string `json:"type"`
+	ID    string `json:"id"`
+	User  *User  `json:"user"`
+	Group *Group `json:"group"`
+	Role  string `json:"role"`
+}
+
+type MembershipCollection struct {
+	CollectionInfo
+	Entries []*Membership `json:"entries"`
+}
