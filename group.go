@@ -203,3 +203,17 @@ func (g *GroupService) UpdateMembership(membershipID, role string) (*http.Respon
 	resp, err := g.Do(req, &membership)
 	return resp, &membership, err
 }
+
+// Documentation: https://developers.box.com/docs/#groups-delete-a-group-membership
+func (g *GroupService) DeleteMembership(membershipID string) (*http.Response, error) {
+	req, err := g.NewRequest(
+		"DELETE",
+		fmt.Sprintf("/group_memberships/%s", membershipID),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return g.Do(req, nil)
+}
