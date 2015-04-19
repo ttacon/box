@@ -103,7 +103,6 @@ func (e *EventService) LongPollURL() (*http.Response, *LongPollInfo, error) {
 }
 
 func (e *EventService) ListenForEvent(i LongPollConnInfo, lastSync string) (*http.Response, []*Event, error) {
-
 	// get events for stream_position=now for sync token
 	var streamPos = lastSync
 	if len(streamPos) == 0 {
@@ -129,7 +128,7 @@ func (e *EventService) ListenForEvent(i LongPollConnInfo, lastSync string) (*htt
 
 	var d = make(map[string]interface{})
 	resp, err := e.Do(req, &d)
-	// deal with timeouts
+	// TODO(ttacon): deal with timeouts
 	if err != nil {
 		return resp, nil, err
 	}

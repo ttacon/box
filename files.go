@@ -341,3 +341,26 @@ func (c *FileService) GetTasksForFile(fileId string) (*http.Response, *TaskColle
 	resp, err := c.Do(req, &data)
 	return resp, &data, err
 }
+
+type Lock struct {
+	Type                string `json:"type"`
+	ExpiresAt           string `json:"expires_at"`
+	IsDownloadPrevented bool   `json:"is_download_prevented"`
+}
+
+// Documentation: https://developers.box.com/docs/#files-lock-and-unlock
+func (f *FileService) Lock(fileID string, lock *Lock) (*http.Response, error) {
+	req, err := f.NewRequest(
+		"PUT",
+		fmt.Sprintf("/files/%s", fileID),
+		map[string]*Lock{
+			"lock": lock,
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return f.Do(req, nil)
+
+}
