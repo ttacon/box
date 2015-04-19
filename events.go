@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/google/go-querystring/query"
 )
@@ -34,9 +35,9 @@ type EventCollection struct {
 }
 
 type EventQueryOptions struct {
-	StreamPosition string
-	StreamType     string
-	Limit          int
+	StreamPosition string `url:"stream_position"`
+	StreamType     string `url:"stream_type"`
+	Limit          int    `url:"limit"`
 }
 
 // Events retrieves events for the currently authenticated user.
@@ -70,6 +71,109 @@ func (e *EventService) Events(options EventQueryOptions) (*http.Response, *Event
 		}
 	}
 	return resp, &data, err
+}
+
+type LongPollInfo struct {
+	ChunkSize int                `json:"chunk_size"`
+	Entries   []LongPollConnInfo `json:"entries"`
+}
+
+type LongPollConnInfo struct {
+	Type         string `json:"type"`
+	URL          string `json:"url"`
+	TTL          string `json:"ttl"`
+	MaxRetries   string `json:"max_retries"`
+	RetryTimeout int    `json:"retry_timeout"`
+}
+
+func (e *EventService) LongPollURL() (*http.Response, *LongPollInfo, error) {
+	req, err := e.NewRequest(
+		"OPTIONS",
+		"/events",
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data LongPollInfo
+	resp, err := e.Do(req, &data)
+	return resp, &data, err
+
+}
+
+func (e *EventService) ListenForEvent(i LongPollConnInfo, lastSync string) (*http.Response, []*Event, error) {
+
+	// get events for stream_position=now for sync token
+	var streamPos = lastSync
+	if len(streamPos) == 0 {
+		resp, events, err := e.Events(EventQueryOptions{
+			StreamPosition: "now",
+		})
+		if err != nil {
+			return resp, nil, err
+		}
+
+		streamPos = strconv.Itoa(events.NextStreamPosition)
+	}
+
+	// TODO(ttacon): timeout info
+	req, err := http.NewRequest(
+		"GET",
+		i.URL,
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var d = make(map[string]interface{})
+	resp, err := e.Do(req, &d)
+	// deal with timeouts
+	if err != nil {
+		return resp, nil, err
+	}
+
+	// get next event with last synced note
+	resp, events, err := e.Events(EventQueryOptions{
+		StreamPosition: streamPos,
+		Limit:          1,
+	})
+	if err != nil {
+		return resp, nil, err
+	}
+	return resp, events.Entries, err
+}
+
+func (e *EventService) Channel(size int) chan *Event {
+	eventStream := make(chan *Event, size)
+	go e.streamEvents(eventStream)
+	return eventStream
+}
+
+func (e *EventService) streamEvents(tunnel chan *Event) {
+	for {
+		_, longPollInfo, err := e.LongPollURL()
+		if err != nil {
+			close(tunnel)
+			return
+		}
+
+		if len(longPollInfo.Entries) != 1 {
+			close(tunnel)
+			return
+		}
+
+		_, events, err := e.ListenForEvent(longPollInfo.Entries[0], "")
+		if err != nil {
+			close(tunnel)
+			return
+		}
+
+		for _, eve := range events {
+			tunnel <- eve
+		}
+	}
 }
 
 ////////// types //////////

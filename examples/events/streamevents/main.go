@@ -15,10 +15,6 @@ var (
 
 	accessToken  = flag.String("atok", "", "Access Token")
 	refreshToken = flag.String("rtok", "", "Refresh Token")
-
-	streamPosition = flag.String("pos", "0", "position in stream to query")
-	streamType     = flag.String("type", "all", "types of events to query")
-	limit          = flag.Int("lim", 100, "limit of events to query")
 )
 
 func main() {
@@ -52,16 +48,8 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, eventCollection, err := c.EventService().Events(box.EventQueryOptions{
-		StreamPosition: *streamPosition,
-		StreamType:     *streamType,
-		Limit:          *limit,
-	})
-	fmt.Println("resp: ", resp)
-	fmt.Println("err: ", err)
-	pretty.Print(eventCollection)
-	fmt.Println("\n# events: ", len(eventCollection.Entries))
-
-	// Print out the new tokens for next time
-	fmt.Printf("\n%#v\n", tok)
+	eventStream := c.EventService().Channel(32)
+	for eve := range eventStream {
+		fmt.Println("got event: ", pretty.Sprintf("%#v\n", eve))
+	}
 }
