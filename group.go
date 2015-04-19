@@ -134,3 +134,18 @@ type MembershipCollection struct {
 	CollectionInfo
 	Entries []*Membership `json:"entries"`
 }
+
+func (g *GroupService) Membership(membershipEntryID string) (*http.Response, *Membership, error) {
+	req, err := g.NewRequest(
+		"GET",
+		fmt.Sprintf("/group_memberships/%s", membershipEntryID),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var membership Membership
+	resp, err := g.Do(req, &membership)
+	return resp, &membership, err
+}
