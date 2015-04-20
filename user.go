@@ -196,3 +196,18 @@ func (c *UserService) CreateUser(user *User) (*http.Response, *User, error) {
 	resp, err := c.Do(req, &data)
 	return resp, &data, err
 }
+
+func (u *UserService) User(userID string) (*http.Response, *User, error) {
+	req, err := u.NewRequest(
+		"GET",
+		fmt.Sprintf("/users/%s", userID),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data User
+	resp, err := u.Do(req, &data)
+	return resp, &data, err
+}
