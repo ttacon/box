@@ -197,6 +197,7 @@ func (c *UserService) CreateUser(user *User) (*http.Response, *User, error) {
 	return resp, &data, err
 }
 
+// Documentation: https://developers.box.com/docs/#users-get-a-users-information
 func (u *UserService) User(userID string) (*http.Response, *User, error) {
 	req, err := u.NewRequest(
 		"GET",
@@ -210,4 +211,34 @@ func (u *UserService) User(userID string) (*http.Response, *User, error) {
 	var data User
 	resp, err := u.Do(req, &data)
 	return resp, &data, err
+}
+
+// Documentation: https://developers.box.com/docs/#users-update-a-users-information
+func (u *UserService) UpdateUser(user *User) (*http.Response, *User, error) {
+	req, err := u.NewRequest(
+		"PUT",
+		fmt.Sprintf("/users/%s", user.ID),
+		user,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data User
+	resp, err := u.Do(req, &data)
+	return resp, &data, err
+}
+
+// Documentation: https://developers.box.com/docs/#users-delete-an-enterprise-user
+func (u *UserService) DeleteUser(userID string) (*http.Response, error) {
+	req, err := u.NewRequest(
+		"DELETE",
+		fmt.Sprintf("/users/%s", userID),
+		nil,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.Do(req, nil)
 }
