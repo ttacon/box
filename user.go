@@ -20,24 +20,24 @@ type User struct {
 	ID                            string   `json:"id,omitempty"`
 	Name                          string   `json:"name,omitempty"`
 	Login                         string   `json:"login,omitempty"`
-	SHA1                          string   `json:"sha"`
-	CreatedAt                     *string  `json:"created_at"`  // TODO(ttacon): change to time.Time
-	ModifiedAt                    *string  `json:"modified_at"` // TODO(ttacon): change to time.Time
-	Role                          string   `json:"role"`
-	Language                      string   `json:"language"`
-	Timezone                      string   `json:"timezone"`
-	SpaceAmount                   int      `json:"space_amount"`
-	SpaceUsed                     int      `json:"space_used"`
-	MaxUploadSize                 int      `json:"max_upload_size"`
-	TrackingCodes                 string   `json:"tracking_codes"` // TODO(ttacon): not sure what this should me
+	SHA1                          string   `json:"sha,omitempty"`
+	CreatedAt                     *string  `json:"created_at,omitempty"`  // TODO(ttacon): change to time.Time
+	ModifiedAt                    *string  `json:"modified_at,omitempty"` // TODO(ttacon): change to time.Time
+	Role                          string   `json:"role,omitempty"`
+	Language                      string   `json:"language,omitempty"`
+	Timezone                      string   `json:"timezone,omitempty"`
+	SpaceAmount                   int      `json:"space_amount,omitempty"`
+	SpaceUsed                     int      `json:"space_used,omitempty"`
+	MaxUploadSize                 int      `json:"max_upload_size,omitempty"`
+	TrackingCodes                 string   `json:"tracking_codes,omitempty"` // TODO(ttacon): not sure what this should me
 	CanSeeManagedUsers            bool     `json:"can_see_managed_users,omitempty"`
 	IsSyncEnabled                 bool     `json:"is_sync_enabled,omitempty"`
 	IsExternalCollabRestricted    bool     `json:"is_external_collab_restricted,omitempty"`
-	Status                        string   `json:"status"`
-	JobTitle                      string   `json:"job_title"`
-	Phone                         string   `json:"phone"`
-	Address                       string   `json:"address"`
-	AvatarUrl                     string   `json:"avatar_url"`
+	Status                        string   `json:"status,omitempty"`
+	JobTitle                      string   `json:"job_title,omitempty"`
+	Phone                         string   `json:"phone,omitempty"`
+	Address                       string   `json:"address,omitempty"`
+	AvatarUrl                     string   `json:"avatar_url,omitempty"`
 	IsExemptFromDeviceLimits      bool     `json:"is_exempt_from_device_limits,omitempty"`
 	IsExemptFromLoginVerification bool     `json:"is_exempt_from_login_verification,omitempty"`
 	Enterprise                    *Item    `json:"enterprise,omitempty"`
@@ -177,6 +177,22 @@ func (c *UserService) Membership(userID string) (*http.Response, *MembershipColl
 	}
 
 	var data MembershipCollection
+	resp, err := c.Do(req, &data)
+	return resp, &data, err
+}
+
+// Documentation: https://developers.box.com/docs/#users-create-an-enterprise-user
+func (c *UserService) CreateUser(user *User) (*http.Response, *User, error) {
+	req, err := c.NewRequest(
+		"POST",
+		"/users",
+		user,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data User
 	resp, err := c.Do(req, &data)
 	return resp, &data, err
 }
