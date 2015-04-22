@@ -3,6 +3,7 @@ package box
 import (
 	"fmt"
 	"net/http"
+	"time"
 )
 
 type FolderService struct {
@@ -24,7 +25,6 @@ type Folder struct {
 	TrashedAt         *string         `json:"trashed_at"`          // TODO(ttacon): change to time.Time
 	ContentModifiedAt *string         `json:"content_modified_at"` // TODO(ttacon): change to time.Time
 	PurgedAt          *string         `json:"purged_at"`           // TODO(ttacon): change to time.Time, this field isn't documented but I keep getting it back...
-	SharedLinkg       *string         `json:"shared_link"`
 	SequenceId        string          `json:"sequence_id"`
 	ETag              *string         `json:"etag"`
 	Name              string          `json:"name"`
@@ -234,4 +234,21 @@ func (c *FolderService) PermanentlyDeleteTrashedFolder(folderId string) (*http.R
 	}
 
 	return c.Do(req, nil)
+}
+
+// Documentation: https://developers.box.com/docs/#folders-permanently-delete-a-trashed-folder
+func (f *FolderService) CreateSharedLink(folderID, access string, unshareAt *time.Time, canDownload, canPreview bool) (*http.Response, *Folder, error) {
+	var toSend = make(map[string]interface{})
+	req, err := f.NewRequest(
+		"PUT",
+		fmt.Sprintf("/folders/%s", folderID),
+		toSend,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var folder Folder
+	resp, err := f.Do(req, &folder)
+	return resp, &folder, err
 }
