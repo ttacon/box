@@ -421,5 +421,69 @@ func (f *FileService) PreflightCheck(file *File) (*http.Response, bool, error) {
 
 	resp, err := f.Do(req, nil)
 	return resp, resp != nil && resp.StatusCode == 200, err
+}
 
+// Documentation: https://developers.box.com/docs/#files-upload-a-new-version-of-a-file
+func (f *FileService) UploadFileVersion(path, fileID string) (*http.Response, *FileCollection, error) {
+	file, err := os.Open(path)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer file.Close()
+
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	fi, err := file.Stat()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var (
+		body   = &bytes.Buffer{}
+		writer = multipart.NewWriter(body)
+	)
+
+	// write the file
+	part, err := writer.CreateFormFile("file", fi.Name())
+	if err != nil {
+		return nil, nil, err
+	}
+	part.Write(fileContents)
+
+	// write the other form fields we need
+	err = writer.WriteField("filename", fi.Name())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	/*
+		err = writer.WriteField("parent_id", parentId)
+		if err != nil {
+			return nil, nil, err
+		}
+	*/
+
+	// TODO(ttacon): add in content_created_at, content_modified_at
+
+	err = writer.Close()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("https://upload.box.com/api/2.0/files/%s/content", fileID),
+		body,
+	)
+	req.Header.Add("Content-Type", writer.FormDataContentType())
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var data FileCollection
+	resp, err := f.Do(req, &data)
+	return resp, &data, err
 }
