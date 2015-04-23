@@ -364,3 +364,19 @@ func (f *FileService) Lock(fileID string, lock *Lock) (*http.Response, error) {
 	return f.Do(req, nil)
 
 }
+
+// Documentation: https://developers.box.com/docs/#files-update-a-files-information
+func (f *FileService) Update(file *File) (*http.Response, *File, error) {
+	req, err := f.NewRequest(
+		"PUT",
+		fmt.Sprintf("/files/%s", file.ID),
+		file,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var updatedFile File
+	resp, err := f.Do(req, &updatedFile)
+	return resp, &updatedFile, err
+}
