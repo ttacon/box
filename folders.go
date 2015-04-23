@@ -264,3 +264,20 @@ type SharedLinkPermissions struct {
 	CanDownload bool `json:"can_download"`
 	CanPreview  bool `json:"can_preview"`
 }
+
+// Documentation: https://developers.box.com/docs/#folders-update-information-about-a-folder
+func (f *FolderService) Update(folder *Folder) (*http.Response, *Folder, error) {
+	// TODO(ttacon): If-Match header
+	req, err := f.NewRequest(
+		"PUT",
+		fmt.Sprintf("/folders/%s", folder.ID),
+		folder,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var newFolder Folder
+	resp, err := f.Do(req, &newFolder)
+	return resp, &newFolder, err
+}
