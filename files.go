@@ -2,6 +2,7 @@ package box
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"mime/multipart"
@@ -379,4 +380,46 @@ func (f *FileService) Update(file *File) (*http.Response, *File, error) {
 	var updatedFile File
 	resp, err := f.Do(req, &updatedFile)
 	return resp, &updatedFile, err
+}
+
+// Documentation: https://developers.box.com/docs/#files-preflight-check
+func (f *FileService) PreflightCheck(file *File) (*http.Response, bool, error) {
+	var (
+		toSend map[string]interface{}
+		route  string
+	)
+
+	if len(file.ID) == 0 {
+		if file.Parent == nil {
+			return nil, false, errors.New("cannot upload new file without a parent")
+		}
+		// assuming it's a new file
+		route = "/files/content"
+		toSend = map[string]interface{}{
+			"name": file.Name,
+			"parent": map[string]string{
+				"id": file.Parent.Name,
+			},
+			"size": file.Size,
+		}
+	} else {
+		// not new, need less data
+		route = fmt.Sprintf("/files/%s/content", file.ID)
+		toSend = map[string]interface{}{
+			"size": file.Size,
+		}
+	}
+
+	req, err := f.NewRequest(
+		"OPTIONS",
+		route,
+		toSend,
+	)
+	if err != nil {
+		return nil, false, err
+	}
+
+	resp, err := f.Do(req, nil)
+	return resp, resp != nil && resp.StatusCode == 200, err
+
 }
