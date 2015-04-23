@@ -237,12 +237,13 @@ func (c *FolderService) PermanentlyDeleteTrashedFolder(folderId string) (*http.R
 }
 
 // Documentation: https://developers.box.com/docs/#folders-permanently-delete-a-trashed-folder
-func (f *FolderService) CreateSharedLink(folderID, access string, unshareAt *time.Time, canDownload, canPreview bool) (*http.Response, *Folder, error) {
-	var toSend = make(map[string]interface{})
+func (f *FolderService) CreateSharedLink(folderID string, options *SharedLinkOptions) (*http.Response, *Folder, error) {
 	req, err := f.NewRequest(
 		"PUT",
 		fmt.Sprintf("/folders/%s", folderID),
-		toSend,
+		map[string]interface{}{
+			"shared_link": options,
+		},
 	)
 	if err != nil {
 		return nil, nil, err
@@ -251,4 +252,15 @@ func (f *FolderService) CreateSharedLink(folderID, access string, unshareAt *tim
 	var folder Folder
 	resp, err := f.Do(req, &folder)
 	return resp, &folder, err
+}
+
+type SharedLinkOptions struct {
+	Access      *string                `json:"access"`
+	UnsharedAt  *time.Time             `json:"unshared_at,omitempty"`
+	Permissions *SharedLinkPermissions `json:"permissions,omitempty"`
+}
+
+type SharedLinkPermissions struct {
+	CanDownload bool `json:"can_download"`
+	CanPreview  bool `json:"can_preview"`
 }

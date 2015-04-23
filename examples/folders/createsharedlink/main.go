@@ -16,7 +16,7 @@ var (
 	accessToken  = flag.String("atok", "", "Access Token")
 	refreshToken = flag.String("rtok", "", "Refresh Token")
 
-	userID = flag.String("uid", "", "user to retrieve")
+	folderID = flag.String("fid", "", "folder to create shared link for")
 )
 
 func main() {
@@ -24,7 +24,7 @@ func main() {
 
 	if len(*clientId) == 0 || len(*clientSecret) == 0 ||
 		len(*accessToken) == 0 || len(*refreshToken) == 0 ||
-		len(*userID) == 0 {
+		len(*folderID) == 0 {
 		fmt.Println("unfortunately all flags must be provided")
 		return
 	}
@@ -51,7 +51,16 @@ func main() {
 		c = configSource.NewClient(tok)
 	)
 
-	resp, user, err := c.FolderService().CreateSharedLink("", "", nil, false, false)
+	resp, user, err := c.FolderService().CreateSharedLink(
+		*folderID,
+		&box.SharedLinkOptions{
+			Access: nil,
+			Permissions: &box.SharedLinkPermissions{
+				CanDownload: true,
+				CanPreview:  true,
+			},
+		},
+	)
 	fmt.Println("resp: ", resp)
 	fmt.Println("err: ", err)
 	pretty.Print(user)
