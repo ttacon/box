@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -108,6 +109,21 @@ func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, err
 		err = json.NewDecoder(resp.Body).Decode(respStr)
 	}
 	return resp, err
+}
+
+// Do "makes" the request, and if there are no errors and resp is not nil,
+// it attempts to unmarshal the  (json) response body into resp.
+func (c *Client) DoAndGetReader(req *http.Request) (*http.Response, io.ReadCloser, error) {
+	resp, err := c.Client.Do(req)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	if resp.StatusCode > 299 || resp.StatusCode < 200 {
+		return nil, nil, errors.New(fmt.Sprintf("http request failed, resp: %#v", resp))
+	}
+
+	return resp, resp.Body, err
 }
 
 //////// Service constructors to make life simpler //////////

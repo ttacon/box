@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -486,4 +488,18 @@ func (f *FileService) UploadFileVersion(path, fileID string) (*http.Response, *F
 	var data FileCollection
 	resp, err := f.Do(req, &data)
 	return resp, &data, err
+}
+
+// Documentation: https://developers.box.com/docs/#files-download-old-version
+func (c *FileService) DownloadVersion(fileId, version string) (*http.Response, io.ReadCloser, error) {
+	req, err := c.NewRequest(
+		"GET",
+		fmt.Sprintf("/files/%s/content?"+url.QueryEscape("version="+version), fileId),
+		nil,
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return c.DoAndGetReader(req)
 }
