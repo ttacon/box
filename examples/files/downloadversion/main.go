@@ -55,14 +55,10 @@ func main() {
 	resp, reader, err := c.FileService().DownloadVersion(*fileId, *fileVersion)
 	fmt.Printf("%#v\n", resp)
 	fmt.Println("err: ", err)
-	// TODO(ttacon): actually download the file here for the example
-	// to be more complete
-	fmt.Printf("%#v\n", reader)
+
 	data, err := ioutil.ReadAll(reader)
 	if err == nil {
-		fmt.Println("got data:")
 		fmt.Println(string(data))
-		fmt.Println(len(data))
 	} else {
 		fmt.Println("err: ", err)
 	}
