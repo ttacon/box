@@ -503,3 +503,33 @@ func (c *FileService) DownloadVersion(fileId, version string) (*http.Response, i
 
 	return c.DoAndGetReader(req)
 }
+
+// Documentation: https://developers.box.com/docs/#files-promote-old-version
+func (f *FileService) PromoteVersion(fileID, fileVersion string) (*http.Response, *FileVersion, error) {
+	req, err := f.NewRequest(
+		"POST",
+		fmt.Sprintf("/files/%s/versions/current", fileID),
+		map[string]string{
+			"type": "file_version",
+			"id":   fileVersion,
+		},
+	)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var fVersion FileVersion
+	resp, err := f.Do(req, &fVersion)
+	return resp, &fVersion, err
+}
+
+type FileVersion struct {
+	Type       string `json:"type"`
+	ID         string `json:"id"`
+	SHA1       string `json:"sha1"`
+	Name       string `json:"name"`
+	Size       int    `json:"size"`
+	CreatedAt  string `json:"created_at"`
+	ModifiedAt string `json:modified_at""`
+	ModifiedBy *Item  `json:"modified_by"`
+}
