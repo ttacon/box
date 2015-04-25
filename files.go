@@ -533,3 +533,18 @@ type FileVersion struct {
 	ModifiedAt string `json:modified_at""`
 	ModifiedBy *Item  `json:"modified_by"`
 }
+
+// Documentation: https://developers.box.com/docs/#files-delete-version
+func (f *FileService) DeleteVersion(fileID, fileVersion string) (*http.Response, bool, error) {
+	req, err := f.NewRequest(
+		"DELETE",
+		fmt.Sprintf("/files/%s/versions/%s", fileID, fileVersion),
+		nil,
+	)
+	if err != nil {
+		return nil, false, err
+	}
+
+	resp, err := f.Do(req, nil)
+	return resp, resp != nil && resp.StatusCode == 204, err
+}
