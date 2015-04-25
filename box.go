@@ -180,3 +180,9 @@ func (c *Client) EventService() *EventService {
 		Client: c,
 	}
 }
+
+func (c *Client) SharedService() *SharedService {
+	return &SharedService{
+		Client: c,
+	}
+}
