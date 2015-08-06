@@ -112,7 +112,7 @@ func (c *Client) Do(req *http.Request, respStr interface{}) (*http.Response, err
 }
 
 // Do "makes" the request, and if there are no errors and resp is not nil,
-// it attempts to unmarshal the  (json) response body into resp.
+// it returns the resp without reading or closing the resp.Body.
 func (c *Client) DoAndGetReader(req *http.Request) (*http.Response, io.ReadCloser, error) {
 	resp, err := c.Client.Do(req)
 	if err != nil {

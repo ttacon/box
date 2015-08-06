@@ -183,7 +183,8 @@ func (c *FileService) DownloadFile(fileId string) (*http.Response, error) {
 		return nil, err
 	}
 
-	return c.Do(req, nil)
+	resp, _, err := c.DoAndGetReader(req)
+	return resp, err
 }
 
 // Documentation: https://developers.box.com/docs/#files-view-versions-of-a-file

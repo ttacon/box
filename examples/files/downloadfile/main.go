@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/ttacon/box"
 	"github.com/ttacon/pretty"
@@ -54,8 +55,13 @@ func main() {
 	resp, err := c.FileService().DownloadFile(*fileId)
 	pretty.Print(resp)
 	fmt.Println("err: ", err)
-	// TODO(ttacon): actually download the file here for the example
-	// to be more complete
+
+	// Read the content into bs
+	var bs []byte
+	defer resp.Body.Close()
+	bs, err = ioutil.ReadAll(resp.Body)
+	fmt.Println("ioutil.ReadAll err: ", err)
+	fmt.Println("read %d bytes", len(bs))
 
 	// Print out the new tokens for next time
 	fmt.Printf("%#v\n", tok)
