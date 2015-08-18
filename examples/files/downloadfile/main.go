@@ -61,7 +61,7 @@ func main() {
 	defer resp.Body.Close()
 	bs, err = ioutil.ReadAll(resp.Body)
 	fmt.Println("ioutil.ReadAll err: ", err)
-	fmt.Println("read %d bytes", len(bs))
+	fmt.Printf("read %d bytes", len(bs))
 
 	// Print out the new tokens for next time
 	fmt.Printf("%#v\n", tok)
